@@ -201,78 +201,31 @@
   const G_CLIENT_ID = '388486752894-ekeiej8dkbq6iql51cifhphe828nrn8e.apps.googleusercontent.com';
   const G_REDIRECT  = 'https://loananselin-eng.github.io/Assistant-vocal/';
   const G_SCOPES    = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks';
-  let gToken = null;
+  let gToken = sessionStorage.getItem('g_token') || null;
 
-  function generateRandom(len) {
-    const arr = new Uint8Array(len);
-    crypto.getRandomValues(arr);
-    return btoa(String.fromCharCode(...arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-  }
-
-  async function sha256(plain) {
-    const enc = new TextEncoder().encode(plain);
-    const hash = await crypto.subtle.digest('SHA-256', enc);
-    return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-  }
-
-  async function signInGoogle() {
-    const verifier = generateRandom(64);
-    const challenge = await sha256(verifier);
-    sessionStorage.setItem('pkce_verifier', verifier);
-    const state = generateRandom(16);
-    sessionStorage.setItem('pkce_state', state);
+  function signInGoogle() {
     const url = 'https://accounts.google.com/o/oauth2/v2/auth'
       + '?client_id=' + G_CLIENT_ID
-      + '&response_type=code'
+      + '&response_type=token'
       + '&redirect_uri=' + encodeURIComponent(G_REDIRECT)
-      + '&scope=' + encodeURIComponent(G_SCOPES)
-      + '&state=' + state
-      + '&code_challenge=' + challenge
-      + '&code_challenge_method=S256'
-      + '&access_type=offline'
-      + '&prompt=consent';
+      + '&scope=' + encodeURIComponent(G_SCOPES);
     window.location.href = url;
   }
   window.signInGoogle = signInGoogle;
 
-  async function checkGoogleCallback() {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-    const state = params.get('state');
-    if (!code) return;
-    if (state !== sessionStorage.getItem('pkce_state')) { showToast('❌ Erreur state'); return; }
-    const verifier = sessionStorage.getItem('pkce_verifier');
-    history.replaceState(null, '', window.location.pathname);
-    try {
-      const res = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: G_CLIENT_ID,
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: G_REDIRECT,
-          code_verifier: verifier
-        })
-      });
-      const data = await res.json();
-      if (data.access_token) {
-        gToken = data.access_token;
-        sessionStorage.setItem('g_token', gToken);
-        const btn = document.getElementById('msBtn');
-        btn.textContent = '✅ Google connecté';
-        btn.style.background = '#076880';
-        showToast('✅ Connecté à Google !');
-      } else {
-        showToast('❌ ' + (data.error_description || data.error || 'Erreur auth'));
-      }
-    } catch(e) {
-      showToast('❌ ' + e.message);
+  function checkGoogleCallback() {
+    const hash = window.location.hash;
+    if (hash.includes('access_token')) {
+      const params = new URLSearchParams(hash.replace('#',''));
+      gToken = params.get('access_token');
+      sessionStorage.setItem('g_token', gToken);
+      history.replaceState(null, '', window.location.pathname);
+      document.getElementById('msBtn').textContent = '✅ Google connecté';
+      document.getElementById('msBtn').style.background = '#076880';
+      showToast('✅ Connecté à Google !');
     }
   }
 
-  // Récupère token en session
-  gToken = sessionStorage.getItem('g_token');
   if (gToken) {
     document.getElementById('msBtn').textContent = '✅ Google connecté';
     document.getElementById('msBtn').style.background = '#076880';
