@@ -221,7 +221,7 @@
     sessionStorage.setItem('pkce_verifier', verifier);
     const state = generateRandom(16);
     sessionStorage.setItem('pkce_state', state);
-    const url = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize'
+    const url = 'https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize'
       + '?client_id=' + MS_CLIENT_ID
       + '&response_type=code'
       + '&redirect_uri=' + encodeURIComponent(MS_REDIRECT)
@@ -251,7 +251,8 @@
           code: code,
           redirect_uri: MS_REDIRECT,
           code_verifier: verifier,
-          scope: MS_SCOPES
+          scope: MS_SCOPES,
+          tenant: 'organizations'
         })
       });
       const data = await res.json();
