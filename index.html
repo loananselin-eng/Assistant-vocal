@@ -221,7 +221,7 @@
     sessionStorage.setItem('pkce_verifier', verifier);
     const state = generateRandom(16);
     sessionStorage.setItem('pkce_state', state);
-    const url = 'https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize'
+    const url = 'https://login.microsoftonline.com/52c529f8-1763-4cbb-98a2-0a210f5cb679/oauth2/v2.0/authorize'
       + '?client_id=' + MS_CLIENT_ID
       + '&response_type=code'
       + '&redirect_uri=' + encodeURIComponent(MS_REDIRECT)
@@ -242,7 +242,7 @@
     const verifier = sessionStorage.getItem('pkce_verifier');
     history.replaceState(null, '', window.location.pathname);
     try {
-      const res = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
+      const res = await fetch('https://login.microsoftonline.com/52c529f8-1763-4cbb-98a2-0a210f5cb679/oauth2/v2.0/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
