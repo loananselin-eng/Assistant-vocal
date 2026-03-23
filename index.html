@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Assistant">
 <link rel="apple-touch-icon" id="appIcon" href="">
-<title>Mon Assistant</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; color:#ffffff; }
   input { color:#ffffff !important; }
@@ -199,38 +199,40 @@
 
   // ── Google Auth (PKCE) ─────────────────────────────────────
   const G_CLIENT_ID = '388486752894-ekeiej8dkbq6iql51cifhphe828nrn8e.apps.googleusercontent.com';
-  const G_REDIRECT  = 'https://loananselin-eng.github.io/Assistant-vocal/';
   const G_SCOPES    = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks';
-  let gToken = sessionStorage.getItem('g_token') || null;
+  let gToken = null;
+  let tokenClient = null;
+
+  function initGoogleAuth() {
+    if (typeof google === 'undefined') { setTimeout(initGoogleAuth, 300); return; }
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: G_CLIENT_ID,
+      scope: G_SCOPES,
+      callback: (resp) => {
+        if (resp.error) { showToast('❌ ' + resp.error); return; }
+        gToken = resp.access_token;
+        sessionStorage.setItem('g_token', gToken);
+        document.getElementById('msBtn').textContent = '✅ Google connecté';
+        document.getElementById('msBtn').style.background = '#076880';
+        showToast('✅ Connecté à Google !');
+      }
+    });
+  }
+  initGoogleAuth();
 
   function signInGoogle() {
-    const url = 'https://accounts.google.com/o/oauth2/v2/auth'
-      + '?client_id=' + G_CLIENT_ID
-      + '&response_type=token'
-      + '&redirect_uri=' + encodeURIComponent(G_REDIRECT)
-      + '&scope=' + encodeURIComponent(G_SCOPES);
-    window.location.href = url;
+    if (!tokenClient) { showToast('⏳ Chargement...'); return; }
+    tokenClient.requestAccessToken();
   }
   window.signInGoogle = signInGoogle;
 
-  function checkGoogleCallback() {
-    const hash = window.location.hash;
-    if (hash.includes('access_token')) {
-      const params = new URLSearchParams(hash.replace('#',''));
-      gToken = params.get('access_token');
-      sessionStorage.setItem('g_token', gToken);
-      history.replaceState(null, '', window.location.pathname);
-      document.getElementById('msBtn').textContent = '✅ Google connecté';
-      document.getElementById('msBtn').style.background = '#076880';
-      showToast('✅ Connecté à Google !');
-    }
-  }
+  function checkGoogleCallback() {}
 
+  gToken = sessionStorage.getItem('g_token') || null;
   if (gToken) {
     document.getElementById('msBtn').textContent = '✅ Google connecté';
     document.getElementById('msBtn').style.background = '#076880';
   }
-  checkGoogleCallback();
 
   async function createCalendarEvent(task) {
     if (!gToken || !task.heure) return;
