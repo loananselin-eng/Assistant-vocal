@@ -89,7 +89,7 @@
   </h1>
 </header>
 
-<button class="ms-btn" id="msBtn" onclick="signInMicrosoft()">🔗 Connecter Microsoft / Outlook</button>
+<button class="ms-btn" id="msBtn" onclick="signInGoogle()">🔗 Connecter Google Calendar & Tasks</button>
 
 <div class="api-bar">
   <input type="password" id="apiKey" placeholder="Clé Groq (gsk_...)"/>
@@ -197,11 +197,11 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
-  // ── Microsoft Auth (PKCE) ──────────────────────────────────
-  const MS_CLIENT_ID = 'aba8e3d7-d506-4030-bd57-4e5e9b9ea5a6';
-  const MS_REDIRECT  = 'https://assistant-vocal-audun.netlify.app/';
-  const MS_SCOPES    = 'Calendars.ReadWrite Tasks.ReadWrite User.Read offline_access';
-  let msToken = null;
+  // ── Google Auth (PKCE) ─────────────────────────────────────
+  const G_CLIENT_ID = '388486752894-ekeiej8dkbq6iql51cifhphe828nrn8e.apps.googleusercontent.com';
+  const G_REDIRECT  = 'https://loananselin-eng.github.io/Assistant-vocal/';
+  const G_SCOPES    = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks';
+  let gToken = null;
 
   function generateRandom(len) {
     const arr = new Uint8Array(len);
@@ -215,25 +215,27 @@
     return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
   }
 
-  async function signInMicrosoft() {
+  async function signInGoogle() {
     const verifier = generateRandom(64);
     const challenge = await sha256(verifier);
     sessionStorage.setItem('pkce_verifier', verifier);
     const state = generateRandom(16);
     sessionStorage.setItem('pkce_state', state);
-    const url = 'https://login.microsoftonline.com/52c529f8-1763-4cbb-98a2-0a210f5cb679/oauth2/v2.0/authorize'
-      + '?client_id=' + MS_CLIENT_ID
+    const url = 'https://accounts.google.com/o/oauth2/v2/auth'
+      + '?client_id=' + G_CLIENT_ID
       + '&response_type=code'
-      + '&redirect_uri=' + encodeURIComponent(MS_REDIRECT)
-      + '&scope=' + encodeURIComponent(MS_SCOPES)
+      + '&redirect_uri=' + encodeURIComponent(G_REDIRECT)
+      + '&scope=' + encodeURIComponent(G_SCOPES)
       + '&state=' + state
       + '&code_challenge=' + challenge
-      + '&code_challenge_method=S256';
+      + '&code_challenge_method=S256'
+      + '&access_type=offline'
+      + '&prompt=consent';
     window.location.href = url;
   }
-  window.signInMicrosoft = signInMicrosoft;
+  window.signInGoogle = signInGoogle;
 
-  async function checkMsCallback() {
+  async function checkGoogleCallback() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     const state = params.get('state');
@@ -242,57 +244,68 @@
     const verifier = sessionStorage.getItem('pkce_verifier');
     history.replaceState(null, '', window.location.pathname);
     try {
-      const res = await fetch('https://login.microsoftonline.com/52c529f8-1763-4cbb-98a2-0a210f5cb679/oauth2/v2.0/token', {
+      const res = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
-          client_id: MS_CLIENT_ID,
+          client_id: G_CLIENT_ID,
           grant_type: 'authorization_code',
           code: code,
-          redirect_uri: MS_REDIRECT,
-          code_verifier: verifier,
-          scope: MS_SCOPES,
-          tenant: 'organizations'
+          redirect_uri: G_REDIRECT,
+          code_verifier: verifier
         })
       });
       const data = await res.json();
       if (data.access_token) {
-        msToken = data.access_token;
-        if (data.refresh_token) sessionStorage.setItem('ms_refresh', data.refresh_token);
+        gToken = data.access_token;
+        sessionStorage.setItem('g_token', gToken);
         const btn = document.getElementById('msBtn');
-        btn.textContent = '✅ Microsoft connecté';
+        btn.textContent = '✅ Google connecté';
         btn.style.background = '#076880';
-        showToast('✅ Connecté à Microsoft !');
+        showToast('✅ Connecté à Google !');
       } else {
-        showToast('❌ ' + (data.error_description || 'Erreur auth'));
+        showToast('❌ ' + (data.error_description || data.error || 'Erreur auth'));
       }
     } catch(e) {
       showToast('❌ ' + e.message);
     }
   }
-  checkMsCallback();
+
+  // Récupère token en session
+  gToken = sessionStorage.getItem('g_token');
+  if (gToken) {
+    document.getElementById('msBtn').textContent = '✅ Google connecté';
+    document.getElementById('msBtn').style.background = '#076880';
+  }
+  checkGoogleCallback();
 
   async function createCalendarEvent(task) {
-    if (!msToken || !task.heure) return;
+    if (!gToken || !task.heure) return;
     const today = new Date().toISOString().split('T')[0];
     const start = today + 'T' + task.heure + ':00';
     const end = new Date(new Date(start).getTime() + 3600000).toISOString();
-    await fetch('https://graph.microsoft.com/v1.0/me/events', {
-      method:'POST',
-      headers:{'Authorization':'Bearer '+msToken,'Content-Type':'application/json'},
-      body:JSON.stringify({ subject:task.titre, start:{dateTime:start,timeZone:'Europe/Paris'}, end:{dateTime:end,timeZone:'Europe/Paris'} })
+    await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + gToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        summary: task.titre,
+        start: { dateTime: start, timeZone: 'Europe/Paris' },
+        end: { dateTime: end, timeZone: 'Europe/Paris' }
+      })
     });
   }
 
-  async function createToDoTask(task) {
-    if (!msToken) return;
-    const lr = await fetch('https://graph.microsoft.com/v1.0/me/todo/lists', { headers:{'Authorization':'Bearer '+msToken} });
-    const ld = await lr.json();
-    const listId = ld.value[0].id;
-    await fetch('https://graph.microsoft.com/v1.0/me/todo/lists/'+listId+'/tasks', {
-      method:'POST',
-      headers:{'Authorization':'Bearer '+msToken,'Content-Type':'application/json'},
-      body:JSON.stringify({ title:task.titre })
+  async function createTask(task) {
+    if (!gToken) return;
+    const listsRes = await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists', {
+      headers: { 'Authorization': 'Bearer ' + gToken }
+    });
+    const lists = await listsRes.json();
+    const listId = lists.items[0].id;
+    await fetch('https://tasks.googleapis.com/tasks/v1/lists/' + listId + '/tasks', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + gToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: task.titre })
     });
   }
 
@@ -376,12 +389,12 @@ Réponds en JSON uniquement, sans markdown, sans backticks. Format exact :
       document.getElementById('responseBox').classList.add('visible');
       showTasks(parsed.taches || []);
 
-      if (msToken && parsed.taches) {
+      if (gToken && parsed.taches) {
         for (const t of parsed.taches) {
           if (t.heure) await createCalendarEvent(t);
-          else await createToDoTask(t);
+          else await createTask(t);
         }
-        showToast('✅ Ajouté dans Outlook & To Do !');
+        showToast('✅ Ajouté dans Google Calendar & Tasks !');
       }
 
       speak(parsed.reponse);
