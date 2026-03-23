@@ -8,57 +8,48 @@
 <meta name="apple-mobile-web-app-title" content="Assistant">
 <link rel="apple-touch-icon" id="appIcon" href="">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<title>Mon Assistant</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; color:#ffffff; }
-  input { color:#ffffff !important; }
-  .api-bar input::placeholder { color:rgba(255,255,255,0.5) !important; }
-  .task-meta { color:#B5CAC1 !important; }
-  .transcript-box .label, .response-box .label { color:#B5CAC1 !important; }
-
-  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#054f64; min-height:100vh; display:flex; flex-direction:column; }
-
-  header { padding:50px 24px 20px; text-align:center; }
-  .date { font-size:13px; color:#B5CAC1; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px; }
-  h1 { font-size:22px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; }
-
-  .api-bar { margin:0 20px 10px; display:flex; gap:8px; align-items:center; }
-  .api-bar input { flex:1; background:#076880; border:1px solid #B5CAC1; border-radius:10px; padding:10px 14px; font-size:13px; outline:none; }
-  .api-bar button { background:#B5CAC1; border:none; border-radius:10px; padding:10px 14px; color:#054f64; font-size:13px; cursor:pointer; font-weight:600; }
-  .ms-btn { width:calc(100% - 40px); margin:0 20px 16px; background:#054f64 !important; border:1px solid #B5CAC1 !important; border-radius:10px; padding:12px; color:#fff !important; font-size:13px; cursor:pointer; text-align:center; }
-
-  .mic-area { display:flex; flex-direction:column; align-items:center; padding:24px; gap:14px; }
-  .mic-btn { width:90px; height:90px; border-radius:50%; border:none; background:linear-gradient(135deg,#076880,#B5CAC1); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:36px; box-shadow:0 0 30px rgba(181,202,193,0.3); transition:all 0.2s; }
-  .mic-btn.recording { background:linear-gradient(135deg,#ff4757,#ff6b81); box-shadow:0 0 40px rgba(255,71,87,0.6); animation:pulse 1.2s infinite; }
-  .mic-btn.loading { animation:spin-glow 1.5s infinite; }
-  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
-  @keyframes spin-glow { 0%,100%{box-shadow:0 0 30px rgba(181,202,193,0.3)} 50%{box-shadow:0 0 60px rgba(181,202,193,0.7)} }
-  .mic-label { font-size:14px; }
-
-  .transcript-box { margin:0 20px; background:#076880; border:1px solid #B5CAC1; border-radius:16px; padding:16px; min-height:60px; font-size:15px; line-height:1.5; display:none; }
-  .transcript-box.visible { display:block; }
-  .transcript-box .label { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; }
-
-  .response-box { margin:14px 20px; background:#043d4f; border:1px solid #B5CAC1; border-radius:16px; padding:16px; display:none; }
-  .response-box.visible { display:block; }
-  .response-box .label { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px; }
-  .response-box p { font-size:15px; line-height:1.6; }
-
-  .tasks-section { margin:0 20px 20px; }
-  .tasks-section h2 { font-size:13px; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px; }
-  .task-card { background:#076880; border:1px solid #B5CAC1; border-radius:12px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:flex-start; gap:12px; animation:slideIn 0.3s ease; }
-  @keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  .task-dot { width:10px; height:10px; border-radius:50%; margin-top:4px; flex-shrink:0; }
-  .dot-urgent{background:#ff4757} .dot-normal{background:#B5CAC1} .dot-reminder{background:#ffffff}
-  .task-info { flex:1; }
-  .task-title { font-size:15px; font-weight:500; margin-bottom:4px; }
-  .task-meta { font-size:12px; color:#B5CAC1 !important; }
-  .task-check { width:22px; height:22px; border-radius:50%; border:2px solid #B5CAC1; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all 0.2s; }
-  .task-check.done { background:#B5CAC1; color:#054f64; }
-  .empty-state { text-align:center; padding:40px 20px; font-size:14px; line-height:1.8; }
-  .empty-state .icon { font-size:40px; margin-bottom:12px; }
-  .status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#B5CAC1; margin-right:6px; }
-  .toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#076880; border:1px solid #B5CAC1; border-radius:20px; padding:10px 20px; font-size:13px; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; }
-  .toast.show { opacity:1; }
+* { margin:0; padding:0; box-sizing:border-box; color:#ffffff; }
+input { color:#ffffff !important; }
+.api-bar input::placeholder { color:rgba(255,255,255,0.5) !important; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#054f64; min-height:100vh; display:flex; flex-direction:column; }
+header { padding:50px 24px 20px; text-align:center; }
+.date { font-size:13px; color:#B5CAC1; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px; }
+h1 { font-size:22px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; }
+.api-bar { margin:0 20px 10px; display:flex; gap:8px; align-items:center; }
+.api-bar input { flex:1; background:#076880; border:1px solid #B5CAC1; border-radius:10px; padding:10px 14px; font-size:13px; outline:none; }
+.api-bar button { background:#B5CAC1; border:none; border-radius:10px; padding:10px 14px; color:#054f64; font-size:13px; cursor:pointer; font-weight:600; }
+.ms-btn { width:calc(100% - 40px); margin:0 20px 16px; background:#054f64 !important; border:1px solid #B5CAC1 !important; border-radius:10px; padding:12px; color:#fff !important; font-size:13px; cursor:pointer; text-align:center; display:block; }
+.mic-area { display:flex; flex-direction:column; align-items:center; padding:24px; gap:14px; }
+.mic-btn { width:90px; height:90px; border-radius:50%; border:none; background:linear-gradient(135deg,#076880,#B5CAC1); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:36px; box-shadow:0 0 30px rgba(181,202,193,0.3); transition:all 0.2s; }
+.mic-btn.recording { background:linear-gradient(135deg,#ff4757,#ff6b81); box-shadow:0 0 40px rgba(255,71,87,0.6); animation:pulse 1.2s infinite; }
+.mic-btn.loading { animation:spin-glow 1.5s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+@keyframes spin-glow { 0%,100%{box-shadow:0 0 30px rgba(181,202,193,0.3)} 50%{box-shadow:0 0 60px rgba(181,202,193,0.7)} }
+.mic-label { font-size:14px; }
+.transcript-box { margin:0 20px; background:#076880; border:1px solid #B5CAC1; border-radius:16px; padding:16px; min-height:60px; font-size:15px; line-height:1.5; display:none; }
+.transcript-box.visible { display:block; }
+.transcript-box .label { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:#B5CAC1; margin-bottom:8px; }
+.response-box { margin:14px 20px; background:#043d4f; border:1px solid #B5CAC1; border-radius:16px; padding:16px; display:none; }
+.response-box.visible { display:block; }
+.response-box .label { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:#B5CAC1; margin-bottom:10px; }
+.response-box p { font-size:15px; line-height:1.6; }
+.section { margin:0 20px 20px; }
+.section h2 { font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:#B5CAC1; margin-bottom:12px; }
+.card { background:#076880; border:1px solid #B5CAC1; border-radius:12px; padding:14px 16px; margin-bottom:10px; }
+.card-title { font-size:15px; font-weight:500; margin-bottom:4px; }
+.card-meta { font-size:12px; color:#B5CAC1; }
+.task-card { display:flex; align-items:flex-start; gap:12px; animation:slideIn 0.3s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.task-dot { width:10px; height:10px; border-radius:50%; margin-top:4px; flex-shrink:0; }
+.dot-urgent{background:#ff4757} .dot-normal{background:#B5CAC1} .dot-reminder{background:#ffffff}
+.task-check { width:22px; height:22px; border-radius:50%; border:2px solid #B5CAC1; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all 0.2s; margin-left:auto; }
+.task-check.done { background:#B5CAC1; color:#054f64; }
+.empty { text-align:center; padding:30px 20px; font-size:14px; color:#B5CAC1; line-height:1.8; }
+.status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#B5CAC1; margin-right:6px; }
+.toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#076880; border:1px solid #B5CAC1; border-radius:20px; padding:10px 20px; font-size:13px; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; z-index:999; }
+.toast.show { opacity:1; }
 </style>
 </head>
 <body>
@@ -70,20 +61,18 @@
       <rect width="200" height="200" fill="#054f64" rx="48"/>
       <line x1="100" y1="8" x2="100" y2="192" stroke="#fff" stroke-width="0.7" stroke-dasharray="2 8" opacity="0.2" stroke-linecap="round"/>
       <line x1="8" y1="100" x2="192" y2="100" stroke="#fff" stroke-width="0.7" stroke-dasharray="2 8" opacity="0.2" stroke-linecap="round"/>
-      <path d="M18 100 Q100 18 182 100" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-      <path d="M20 104 Q100 22 180 104" fill="none" stroke="#fff" stroke-width="0.5" stroke-linecap="round" opacity="0.25"/>
-      <path d="M18 100 Q100 182 182 100" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-      <path d="M20 96 Q100 178 180 96" fill="none" stroke="#fff" stroke-width="0.5" stroke-linecap="round" opacity="0.25"/>
+      <path d="M18 100 Q100 18 182 100" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+      <path d="M20 110 Q100 28 180 110" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+      <path d="M18 100 Q100 182 182 100" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+      <path d="M20 90 Q100 172 180 90" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
       <rect x="0" y="0" width="22" height="200" fill="#054f64"/>
       <rect x="178" y="0" width="22" height="200" fill="#054f64"/>
       <circle cx="100" cy="100" r="28" fill="#076880"/>
       <ellipse cx="107" cy="100" rx="22" ry="28" fill="#054f64" opacity="0.22"/>
-      <circle cx="100" cy="100" r="28" fill="none" stroke="#B5CAC1" stroke-width="1.3"/>
-      <ellipse cx="100" cy="100" rx="48" ry="12" fill="none" stroke="#B5CAC1" stroke-width="1.5" transform="rotate(-15 100 100)"/>
+      <circle cx="100" cy="100" r="28" fill="none" stroke="#B5CAC1" stroke-width="1.8"/>
+      <ellipse cx="100" cy="100" rx="48" ry="12" fill="none" stroke="#B5CAC1" stroke-width="2" transform="rotate(-15 100 100)"/>
       <circle cx="100" cy="100" r="28" fill="#076880"/>
-      <circle cx="100" cy="100" r="28" fill="none" stroke="#B5CAC1" stroke-width="1.3"/>
-      <circle cx="90" cy="89" r="6" fill="#fff" opacity="0.1"/>
-      <circle cx="88" cy="87" r="2.5" fill="#fff" opacity="0.2"/>
+      <circle cx="100" cy="100" r="28" fill="none" stroke="#B5CAC1" stroke-width="1.8"/>
     </svg>
     Bonjour !
   </h1>
@@ -111,13 +100,15 @@
   <p id="responseText"></p>
 </div>
 
-<div class="tasks-section">
+<div class="section" id="dashSection" style="display:none">
+  <h2>📊 Récap agenda & tâches</h2>
+  <div id="dashboard"><div class="empty">Chargement...</div></div>
+</div>
+
+<div class="section">
   <h2>Tâches du jour</h2>
   <div id="tasksList">
-    <div class="empty-state">
-      <div class="icon">🎙️</div>
-      Parle à ton assistant ce matin<br>pour voir tes tâches apparaître ici
-    </div>
+    <div class="empty">🎙️<br>Parle à ton assistant ce matin<br>pour voir tes tâches apparaître ici</div>
   </div>
 </div>
 
@@ -125,96 +116,98 @@
 
 <script>
 (function() {
-  // ── Icône PWA ──────────────────────────────────────────────
-  const c = document.createElement('canvas');
-  c.width = 512; c.height = 512;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = '#054f64';
-  ctx.beginPath(); ctx.moveTo(123,0); ctx.lineTo(389,0);
-  ctx.quadraticCurveTo(512,0,512,123); ctx.lineTo(512,389);
-  ctx.quadraticCurveTo(512,512,389,512); ctx.lineTo(123,512);
-  ctx.quadraticCurveTo(0,512,0,389); ctx.lineTo(0,123);
-  ctx.quadraticCurveTo(0,0,123,0); ctx.closePath(); ctx.fill();
-  ctx.strokeStyle='#fff'; ctx.lineWidth=1.8; ctx.globalAlpha=0.2;
-  ctx.setLineDash([5,20]); ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(256,20); ctx.lineTo(256,492); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(20,256); ctx.lineTo(492,256); ctx.stroke();
-  ctx.setLineDash([]); ctx.globalAlpha=1;
-  ctx.strokeStyle='#fff'; ctx.lineWidth=18; ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(46,256); ctx.quadraticCurveTo(256,46,466,256); ctx.stroke();
-  ctx.lineWidth=5; ctx.globalAlpha=0.25;
-  ctx.beginPath(); ctx.moveTo(50,276); ctx.quadraticCurveTo(256,66,462,276); ctx.stroke();
-  ctx.globalAlpha=1; ctx.lineWidth=18;
-  ctx.beginPath(); ctx.moveTo(46,256); ctx.quadraticCurveTo(256,466,466,256); ctx.stroke();
-  ctx.lineWidth=5; ctx.globalAlpha=0.25;
-  ctx.beginPath(); ctx.moveTo(50,236); ctx.quadraticCurveTo(256,446,462,236); ctx.stroke();
-  ctx.globalAlpha=1;
-  ctx.fillStyle='#054f64'; ctx.fillRect(0,0,56,512); ctx.fillRect(456,0,56,512);
-  ctx.fillStyle='#076880'; ctx.beginPath(); ctx.arc(256,256,90,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#054f64'; ctx.globalAlpha=0.22;
-  ctx.beginPath(); ctx.ellipse(278,256,70,90,0,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha=1; ctx.strokeStyle='#B5CAC1'; ctx.lineWidth=3.5;
-  ctx.beginPath(); ctx.arc(256,256,90,0,Math.PI*2); ctx.stroke();
-  ctx.save(); ctx.translate(256,256); ctx.rotate(-15*Math.PI/180);
-  ctx.strokeStyle='#B5CAC1'; ctx.lineWidth=4;
-  ctx.beginPath(); ctx.ellipse(0,0,155,40,0,0,Math.PI*2); ctx.stroke();
-  ctx.restore();
-  ctx.fillStyle='#076880'; ctx.beginPath(); ctx.arc(256,256,90,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle='#B5CAC1'; ctx.lineWidth=3.5;
-  ctx.beginPath(); ctx.arc(256,256,90,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle='#fff'; ctx.globalAlpha=0.1;
-  ctx.beginPath(); ctx.arc(226,220,20,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha=0.2; ctx.beginPath(); ctx.arc(218,212,8,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha=1;
-  document.getElementById('appIcon').href = c.toDataURL('image/png');
+
+  // ── Icône PWA canvas ───────────────────────────────────────
+  const cv = document.createElement('canvas');
+  cv.width = 512; cv.height = 512;
+  const cx = cv.getContext('2d');
+  cx.fillStyle='#054f64';
+  cx.beginPath(); cx.moveTo(123,0); cx.lineTo(389,0);
+  cx.quadraticCurveTo(512,0,512,123); cx.lineTo(512,389);
+  cx.quadraticCurveTo(512,512,389,512); cx.lineTo(123,512);
+  cx.quadraticCurveTo(0,512,0,389); cx.lineTo(0,123);
+  cx.quadraticCurveTo(0,0,123,0); cx.closePath(); cx.fill();
+  cx.strokeStyle='#fff'; cx.lineWidth=1.8; cx.globalAlpha=0.2;
+  cx.setLineDash([5,20]); cx.lineCap='round';
+  cx.beginPath(); cx.moveTo(256,20); cx.lineTo(256,492); cx.stroke();
+  cx.beginPath(); cx.moveTo(20,256); cx.lineTo(492,256); cx.stroke();
+  cx.setLineDash([]); cx.globalAlpha=1;
+  cx.strokeStyle='#fff'; cx.lineWidth=18; cx.lineCap='round';
+  cx.beginPath(); cx.moveTo(46,256); cx.quadraticCurveTo(256,46,466,256); cx.stroke();
+  cx.lineWidth=5; cx.globalAlpha=0.25;
+  cx.beginPath(); cx.moveTo(50,276); cx.quadraticCurveTo(256,66,462,276); cx.stroke();
+  cx.globalAlpha=1; cx.lineWidth=18;
+  cx.beginPath(); cx.moveTo(46,256); cx.quadraticCurveTo(256,466,466,256); cx.stroke();
+  cx.lineWidth=5; cx.globalAlpha=0.25;
+  cx.beginPath(); cx.moveTo(50,236); cx.quadraticCurveTo(256,446,462,236); cx.stroke();
+  cx.globalAlpha=1;
+  cx.fillStyle='#054f64'; cx.fillRect(0,0,56,512); cx.fillRect(456,0,56,512);
+  cx.fillStyle='#076880'; cx.beginPath(); cx.arc(256,256,90,0,Math.PI*2); cx.fill();
+  cx.fillStyle='#054f64'; cx.globalAlpha=0.22;
+  cx.beginPath(); cx.ellipse(278,256,70,90,0,0,Math.PI*2); cx.fill();
+  cx.globalAlpha=1; cx.strokeStyle='#B5CAC1'; cx.lineWidth=3.5;
+  cx.beginPath(); cx.arc(256,256,90,0,Math.PI*2); cx.stroke();
+  cx.save(); cx.translate(256,256); cx.rotate(-15*Math.PI/180);
+  cx.strokeStyle='#B5CAC1'; cx.lineWidth=4;
+  cx.beginPath(); cx.ellipse(0,0,155,40,0,0,Math.PI*2); cx.stroke();
+  cx.restore();
+  cx.fillStyle='#076880'; cx.beginPath(); cx.arc(256,256,90,0,Math.PI*2); cx.fill();
+  cx.strokeStyle='#B5CAC1'; cx.lineWidth=3.5;
+  cx.beginPath(); cx.arc(256,256,90,0,Math.PI*2); cx.stroke();
+  document.getElementById('appIcon').href = cv.toDataURL('image/png');
 
   // ── Manifest PWA ───────────────────────────────────────────
-  const manifest = { name:"Mon Assistant", short_name:"Assistant", start_url:"/", display:"standalone", background_color:"#054f64", theme_color:"#054f64" };
-  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-  const mlink = document.createElement('link');
-  mlink.rel='manifest'; mlink.href=URL.createObjectURL(blob);
-  document.head.appendChild(mlink);
+  const mf = {name:"Mon Assistant",short_name:"Assistant",start_url:"/Assistant-vocal/",display:"standalone",background_color:"#054f64",theme_color:"#054f64"};
+  const ml = document.createElement('link');
+  ml.rel='manifest'; ml.href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/json'}));
+  document.head.appendChild(ml);
 
   // ── Date ───────────────────────────────────────────────────
-  const now = new Date();
-  document.getElementById('dateDisplay').textContent = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
-
-  // ── Clé Groq ───────────────────────────────────────────────
-  let GROQ_KEY = localStorage.getItem('groq_key') || '';
-  if (GROQ_KEY) document.getElementById('apiKey').value = GROQ_KEY;
-
-  function saveKey() {
-    GROQ_KEY = document.getElementById('apiKey').value.trim();
-    localStorage.setItem('groq_key', GROQ_KEY);
-    showToast('✅ Clé sauvegardée !');
-  }
-  window.saveKey = saveKey;
+  document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 
   // ── Toast ──────────────────────────────────────────────────
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2500);
   }
 
-  // ── Google Auth (PKCE) ─────────────────────────────────────
-  const G_CLIENT_ID = '388486752894-ekeiej8dkbq6iql51cifhphe828nrn8e.apps.googleusercontent.com';
-  const G_SCOPES    = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks';
-  let gToken = null;
-  let tokenClient = null;
+  // ── Clé Groq ───────────────────────────────────────────────
+  let GROQ_KEY = localStorage.getItem('groq_key')||'';
+  if (GROQ_KEY) document.getElementById('apiKey').value=GROQ_KEY;
+  function saveKey() {
+    GROQ_KEY=document.getElementById('apiKey').value.trim();
+    localStorage.setItem('groq_key',GROQ_KEY);
+    showToast('✅ Clé sauvegardée !');
+  }
+  window.saveKey=saveKey;
+
+  // ── Google Auth ────────────────────────────────────────────
+  const G_CLIENT_ID='388486752894-ekeiej8dkbq6iql51cifhphe828nrn8e.apps.googleusercontent.com';
+  const G_SCOPES='https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks';
+  let gToken=sessionStorage.getItem('g_token')||null;
+  let tokenClient=null;
+
+  if (gToken) {
+    document.getElementById('msBtn').textContent='✅ Google connecté';
+    document.getElementById('msBtn').style.background='#076880';
+    document.getElementById('dashSection').style.display='block';
+    loadDashboard();
+  }
 
   function initGoogleAuth() {
-    if (typeof google === 'undefined') { setTimeout(initGoogleAuth, 300); return; }
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: G_CLIENT_ID,
-      scope: G_SCOPES,
-      callback: (resp) => {
-        if (resp.error) { showToast('❌ ' + resp.error); return; }
-        gToken = resp.access_token;
-        sessionStorage.setItem('g_token', gToken);
-        document.getElementById('msBtn').textContent = '✅ Google connecté';
-        document.getElementById('msBtn').style.background = '#076880';
+    if (typeof google==='undefined') { setTimeout(initGoogleAuth,300); return; }
+    tokenClient=google.accounts.oauth2.initTokenClient({
+      client_id:G_CLIENT_ID, scope:G_SCOPES,
+      callback:(resp)=>{
+        if (resp.error) { showToast('❌ '+resp.error); return; }
+        gToken=resp.access_token;
+        sessionStorage.setItem('g_token',gToken);
+        document.getElementById('msBtn').textContent='✅ Google connecté';
+        document.getElementById('msBtn').style.background='#076880';
+        document.getElementById('dashSection').style.display='block';
         showToast('✅ Connecté à Google !');
+        loadDashboard();
       }
     });
   }
@@ -224,85 +217,123 @@
     if (!tokenClient) { showToast('⏳ Chargement...'); return; }
     tokenClient.requestAccessToken();
   }
-  window.signInGoogle = signInGoogle;
+  window.signInGoogle=signInGoogle;
 
-  function checkGoogleCallback() {}
-
-  gToken = sessionStorage.getItem('g_token') || null;
-  if (gToken) {
-    document.getElementById('msBtn').textContent = '✅ Google connecté';
-    document.getElementById('msBtn').style.background = '#076880';
-  }
-
+  // ── Google Calendar ────────────────────────────────────────
   async function createCalendarEvent(task) {
-    if (!gToken || !task.heure) return;
-    const today = new Date().toISOString().split('T')[0];
-    const start = today + 'T' + task.heure + ':00';
-    const end = new Date(new Date(start).getTime() + 3600000).toISOString();
-    await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + gToken, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        summary: task.titre,
-        start: { dateTime: start, timeZone: 'Europe/Paris' },
-        end: { dateTime: end, timeZone: 'Europe/Paris' }
-      })
+    if (!gToken) return;
+    const date=task.date||new Date().toISOString().split('T')[0];
+    const body=task.heure ? {
+      summary:task.titre,
+      start:{dateTime:date+'T'+task.heure+':00',timeZone:'Europe/Paris'},
+      end:{dateTime:new Date(new Date(date+'T'+task.heure+':00').getTime()+3600000).toISOString(),timeZone:'Europe/Paris'}
+    } : {
+      summary:task.titre,
+      start:{date:date},
+      end:{date:date}
+    };
+    await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},
+      body:JSON.stringify(body)
     });
   }
 
+  // ── Google Tasks ───────────────────────────────────────────
   async function createTask(task) {
     if (!gToken) return;
-    const listsRes = await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists', {
-      headers: { 'Authorization': 'Bearer ' + gToken }
+    const lr=await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists',{headers:{'Authorization':'Bearer '+gToken}});
+    const ld=await lr.json();
+    const listId=ld.items[0].id;
+    await fetch('https://tasks.googleapis.com/tasks/v1/lists/'+listId+'/tasks',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},
+      body:JSON.stringify({title:task.titre})
     });
-    const lists = await listsRes.json();
-    const listId = lists.items[0].id;
-    await fetch('https://tasks.googleapis.com/tasks/v1/lists/' + listId + '/tasks', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + gToken, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: task.titre })
-    });
+  }
+
+  // ── Dashboard ──────────────────────────────────────────────
+  async function loadDashboard() {
+    if (!gToken) return;
+    const dash=document.getElementById('dashboard');
+    dash.innerHTML='<div class="empty">Chargement...</div>';
+    try {
+      const now=new Date();
+      const in7=new Date(now.getTime()+7*24*3600*1000);
+      const calRes=await fetch(
+        'https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin='+now.toISOString()+'&timeMax='+in7.toISOString()+'&orderBy=startTime&singleEvents=true&maxResults=10',
+        {headers:{'Authorization':'Bearer '+gToken}}
+      );
+      const calData=await calRes.json();
+      const events=calData.items||[];
+
+      const lr=await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists',{headers:{'Authorization':'Bearer '+gToken}});
+      const ld=await lr.json();
+      const listId=ld.items[0].id;
+      const tr=await fetch('https://tasks.googleapis.com/tasks/v1/lists/'+listId+'/tasks?showCompleted=false&maxResults=10',{headers:{'Authorization':'Bearer '+gToken}});
+      const td=await tr.json();
+      const tasks=td.items||[];
+
+      let html='';
+      if (events.length) {
+        events.forEach(e=>{
+          const d=e.start.dateTime||e.start.date;
+          const date=new Date(d).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+          const time=e.start.dateTime?' · '+new Date(e.start.dateTime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+          html+=`<div class="card"><div class="card-title">📅 ${e.summary}</div><div class="card-meta">${date}${time}</div></div>`;
+        });
+      }
+      if (tasks.length) {
+        tasks.forEach(t=>{
+          html+=`<div class="card"><div class="card-title">✅ ${t.title}</div></div>`;
+        });
+      }
+      if (!html) html='<div class="empty">Aucun événement ni tâche à venir 🎉</div>';
+      dash.innerHTML=html;
+    } catch(e) {
+      dash.innerHTML='<div class="empty">Erreur : '+e.message+'</div>';
+    }
   }
 
   // ── Micro ──────────────────────────────────────────────────
-  let recognition = null, isRecording = false;
+  let recognition=null, isRecording=false;
 
   function toggleRecording() {
     if (!GROQ_KEY) { showToast('⚠️ Entre ta clé Groq d\'abord !'); return; }
     isRecording ? stopRecording() : startRecording();
   }
-  window.toggleRecording = toggleRecording;
+  window.toggleRecording=toggleRecording;
 
   function startRecording() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     if (!SR) { showToast('❌ Micro non supporté'); return; }
-    recognition = new SR();
-    recognition.lang = 'fr-FR';
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    let finalTranscript = '';
+    recognition=new SR();
+    recognition.lang='fr-FR';
+    recognition.continuous=false;
+    recognition.interimResults=true;
+    let final='';
 
-    recognition.onstart = () => {
-      isRecording = true; finalTranscript = '';
+    recognition.onstart=()=>{
+      isRecording=true; final='';
       document.getElementById('micBtn').classList.add('recording');
-      document.getElementById('micBtn').textContent = '⏹️';
-      document.getElementById('micLabel').textContent = 'En écoute...';
+      document.getElementById('micBtn').textContent='⏹️';
+      document.getElementById('micLabel').textContent='En écoute...';
       document.getElementById('transcriptBox').classList.add('visible');
-      document.getElementById('transcriptText').textContent = '...';
+      document.getElementById('transcriptText').textContent='...';
     };
-    recognition.onresult = e => {
-      let interim = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
-        else interim += e.results[i][0].transcript;
+    recognition.onresult=e=>{
+      let interim='';
+      for (let i=e.resultIndex;i<e.results.length;i++) {
+        if (e.results[i].isFinal) final+=e.results[i][0].transcript;
+        else interim+=e.results[i][0].transcript;
       }
-      document.getElementById('transcriptText').textContent = finalTranscript || interim || '...';
+      document.getElementById('transcriptText').textContent=final||interim||'...';
     };
-    recognition.onerror = e => { showToast('❌ ' + e.error); resetMic(); };
-    recognition.onend = () => {
-      const txt = document.getElementById('transcriptText').textContent;
-      const best = finalTranscript.trim() || txt.trim();
-      if (best && best !== '...') analyzeWithGroq(best);
+    recognition.onerror=e=>{ showToast('❌ '+e.error); resetMic(); };
+    recognition.onend=()=>{
+      const txt=document.getElementById('transcriptText').textContent;
+      const best=final.trim()||txt.trim();
+      if (best&&best!=='...') analyzeWithGroq(best);
       else { showToast('⚠️ Rien entendu, réessaie'); resetMic(); }
     };
     recognition.start();
@@ -311,66 +342,74 @@
   function stopRecording() { if (recognition) recognition.stop(); resetMic(); }
 
   function resetMic() {
-    isRecording = false;
-    const btn = document.getElementById('micBtn');
+    isRecording=false;
+    const btn=document.getElementById('micBtn');
     btn.classList.remove('recording','loading');
-    btn.textContent = '🎙️';
-    document.getElementById('micLabel').textContent = 'Appuie pour parler';
+    btn.textContent='🎙️';
+    document.getElementById('micLabel').textContent='Appuie pour parler';
   }
 
   // ── Groq ───────────────────────────────────────────────────
   async function analyzeWithGroq(transcript) {
-    const btn = document.getElementById('micBtn');
-    btn.classList.add('loading'); btn.textContent = '⏳';
-    document.getElementById('micLabel').textContent = 'L\'IA analyse...';
+    const btn=document.getElementById('micBtn');
+    btn.classList.add('loading'); btn.textContent='⏳';
+    document.getElementById('micLabel').textContent='L\'IA analyse...';
 
-    const prompt = `Tu es un assistant personnel. L'utilisateur te parle le matin.
+    const today=new Date();
+    const prompt=`Tu es un assistant personnel. L'utilisateur te parle le matin.
+Date et heure actuelles : ${today.toLocaleString('fr-FR',{timeZone:'Europe/Paris'})}
+Jour actuel : ${today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+
 Voici ce qu'il a dit : "${transcript}"
-Réponds en JSON uniquement, sans markdown, sans backticks. Format exact :
-{"reponse":"Une réponse naturelle et encourageante (2-3 phrases)","taches":[{"titre":"titre","heure":"HH:MM ou vide","type":"urgent|normal|rappel"}]}`;
+
+IMPORTANT pour les dates :
+- Si l'utilisateur dit "demain", calcule la date de demain
+- Si l'utilisateur dit "lundi", "mardi" etc., calcule la prochaine occurrence
+- Si l'utilisateur dit "dans X jours", calcule correctement
+- Toujours mettre la date ISO dans le champ "date" (format YYYY-MM-DD)
+
+Réponds en JSON uniquement, sans markdown, sans backticks :
+{"reponse":"réponse naturelle 2-3 phrases","taches":[{"titre":"titre","date":"YYYY-MM-DD","heure":"HH:MM ou vide","type":"urgent|normal|rappel"}]}`;
 
     try {
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-        body:JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[{role:'user',content:prompt}], temperature:0.7 })
+        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.7})
       });
-      const data = await res.json();
-      if (data.error) { showToast('❌ ' + data.error.message); resetMic(); return; }
-      let raw = data.choices[0].message.content.replace(/```json|```/g,'').trim();
-      const parsed = JSON.parse(raw);
+      const data=await res.json();
+      if (data.error) { showToast('❌ '+data.error.message); resetMic(); return; }
+      const parsed=JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
 
-      document.getElementById('responseText').textContent = parsed.reponse;
+      document.getElementById('responseText').textContent=parsed.reponse;
       document.getElementById('responseBox').classList.add('visible');
-      showTasks(parsed.taches || []);
+      showTasks(parsed.taches||[]);
 
-      if (gToken && parsed.taches) {
+      if (gToken&&parsed.taches) {
         for (const t of parsed.taches) {
-          if (t.heure) await createCalendarEvent(t);
-          else await createTask(t);
+          await createCalendarEvent(t);
+          await createTask(t);
         }
         showToast('✅ Ajouté dans Google Calendar & Tasks !');
+        loadDashboard();
       }
-
       speak(parsed.reponse);
     } catch(err) {
-      showToast('❌ ' + err.message);
+      showToast('❌ '+err.message);
     }
     resetMic();
   }
 
   function showTasks(tasks) {
-    const list = document.getElementById('tasksList');
-    if (list.querySelector('.empty-state')) list.innerHTML = '';
-    tasks.forEach(t => {
-      const dot = t.type==='urgent' ? 'dot-urgent' : t.type==='rappel' ? 'dot-reminder' : 'dot-normal';
-      const card = document.createElement('div');
-      card.className = 'task-card';
-      card.innerHTML = `<div class="task-dot ${dot}"></div>
-        <div class="task-info">
-          <div class="task-title">${t.titre}</div>
-          <div class="task-meta">${t.type}${t.heure?' · '+t.heure:''}</div>
-        </div>
+    const list=document.getElementById('tasksList');
+    if (list.querySelector('.empty')) list.innerHTML='';
+    tasks.forEach(t=>{
+      const dot=t.type==='urgent'?'dot-urgent':t.type==='rappel'?'dot-reminder':'dot-normal';
+      const card=document.createElement('div');
+      card.className='card task-card';
+      card.innerHTML=`<div class="task-dot ${dot}"></div>
+        <div style="flex:1"><div class="card-title">${t.titre}</div>
+        <div class="card-meta">${t.type}${t.date?' · '+t.date:''}${t.heure?' · '+t.heure:''}</div></div>
         <div class="task-check" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':''"></div>`;
       list.appendChild(card);
     });
@@ -378,8 +417,8 @@ Réponds en JSON uniquement, sans markdown, sans backticks. Format exact :
 
   function speak(text) {
     if (!window.speechSynthesis) return;
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'fr-FR'; u.rate = 1.05;
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='fr-FR'; u.rate=1.05;
     window.speechSynthesis.speak(u);
   }
 
