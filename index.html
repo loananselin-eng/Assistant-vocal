@@ -46,9 +46,9 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 .d-urgences{background:#ff4757}.d-travail{background:#4a90d9}.d-projets{background:#B5CAC1}.d-personnel{background:#2ed573}
 .score-bar{display:flex;gap:8px;margin-bottom:14px}
 .score-day{flex:1;background:#043d4f;border:1px solid rgba(181,202,193,0.2);border-radius:10px;padding:10px 8px;text-align:center}
-.score-day .dn{font-size:11px;color:#B5CAC1;margin-bottom:4px}
-.score-day .ds{font-size:18px}
-.score-day .dl{font-size:10px;margin-top:2px}
+.dn{font-size:11px;color:#B5CAC1;margin-bottom:4px}
+.ds{font-size:18px}
+.dl{font-size:10px;margin-top:2px}
 .sl{color:#2ed573}.sm{color:#f39c12}.sh{color:#ff4757}
 .focus-btn{display:flex;align-items:center;gap:8px;background:#043d4f;border:1px solid rgba(181,202,193,0.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;cursor:pointer}
 .toggle{width:36px;height:20px;background:#076880;border-radius:10px;position:relative;flex-shrink:0;transition:background 0.2s}
@@ -78,6 +78,16 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 .cat-opt{background:#076880;border:1px solid rgba(181,202,193,0.3);border-radius:10px;padding:12px;text-align:center;font-size:14px;cursor:pointer}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none}
 .overlay.open{display:block}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.week-day{background:#043d4f;border:1px solid rgba(181,202,193,0.2);border-radius:10px;padding:6px 3px;min-height:76px;cursor:pointer;transition:border-color 0.2s}
+.week-day.today{border-color:#B5CAC1}
+.week-day.selected{border-color:#fff;background:#054f64}
+.wdn{font-size:9px;text-transform:uppercase;color:#B5CAC1;text-align:center;margin-bottom:2px}
+.wdd{font-size:14px;font-weight:600;text-align:center;margin-bottom:3px}
+.wdot{width:6px;height:6px;border-radius:50%;margin:1px auto}
+.week-detail{background:#043d4f;border:1px solid rgba(181,202,193,0.25);border-radius:12px;padding:12px;margin-bottom:14px;display:none}
+.week-detail.visible{display:block}
+.wdt{font-size:11px;color:#B5CAC1;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em}
 </style>
 </head>
 <body>
@@ -110,6 +120,7 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
   <div class="tab" onclick="switchTab('profile')">👤</div>
 </div>
 
+<!-- VOCAL -->
 <div class="page active" id="page-vocal">
   <button class="btn" id="msBtn" onclick="signInGoogle()">🔗 Connecter Google</button>
   <div class="mic-area">
@@ -121,6 +132,7 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
   <div id="todayTasks"></div>
 </div>
 
+<!-- DASHBOARD -->
 <div class="page" id="page-dashboard">
   <div class="focus-btn" onclick="toggleFocus()">
     <div style="flex:1"><div style="font-weight:500;font-size:13px">🎯 Mode Focus — Urgences uniquement</div></div>
@@ -142,6 +154,7 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
   <div id="dashboard"><div class="empty">Connecte Google pour voir ton dashboard</div></div>
 </div>
 
+<!-- AJOUTER -->
 <div class="page" id="page-add">
   <div class="sec">Ajouter manuellement</div>
   <div class="add-form">
@@ -163,19 +176,22 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
   </div>
 </div>
 
+<!-- PROFIL -->
 <div class="page" id="page-profile">
   <div class="sec">Mon profil — contexte pour l'IA</div>
   <div class="add-form">
     <input type="text" id="pNom" placeholder="Ton prénom..."/>
     <input type="text" id="pPoste" placeholder="Ton poste / rôle..."/>
-    <input type="text" id="pProjets" placeholder="Projets en cours (ex: Projet Lima, M&A ROTRANS...)"/>
-    <input type="text" id="pHoraires" placeholder="Horaires (ex: 8h-19h, pause déj 13h)"/>
-    <button class="btn-ash" style="width:100%" onclick="saveProfile()">💾 Sauvegarder mon profil</button>
+    <input type="text" id="pProjets" placeholder="Projets en cours..."/>
+    <input type="text" id="pHoraires" placeholder="Horaires (ex: 8h-19h)"/>
+    <button class="btn-ash" style="width:100%" onclick="saveProfile()">💾 Sauvegarder</button>
   </div>
   <div class="sec">Historique récent</div>
   <div id="historyList"></div>
   <button onclick="clearHistory()" style="background:none;border:1px solid rgba(255,71,87,0.4);border-radius:10px;padding:8px 16px;font-size:12px;color:#ff8f9a;cursor:pointer;width:100%;margin-top:8px">🗑️ Effacer l'historique</button>
 </div>
+
+<div class="overlay" id="overlay" onclick="closeCatModal()"></div>
 <div class="cat-modal" id="catModal">
   <h3>Déplacer vers...</h3>
   <div class="cat-opts">
@@ -185,7 +201,6 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
     <div class="cat-opt" onclick="moveToCat('personnel')">👤 Personnel</div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -199,32 +214,38 @@ var hiddenEvents=JSON.parse(localStorage.getItem('hidden_events')||'{}');
 var allDashItems=[];
 var cachedListId=null;
 var selectedItemId=null;
+var memory={
+  profile:JSON.parse(localStorage.getItem('user_profile')||'{}'),
+  history:JSON.parse(localStorage.getItem('task_history')||'[]'),
+  patterns:JSON.parse(localStorage.getItem('patterns')||'{}')
+};
+var catColors={urgences:'#ff4757',travail:'#4a90d9',projets:'#B5CAC1',personnel:'#2ed573'};
+var catLabels={urgences:'🚨 Urgences',travail:'💼 Travail',projets:'🚀 Projets',personnel:'👤 Personnel'};
 
 // PWA icon
-var cv=document.createElement('canvas');cv.width=512;cv.height=512;
-var cx=cv.getContext('2d');
-cx.fillStyle='#054f64';cx.beginPath();cx.moveTo(123,0);cx.lineTo(389,0);
-cx.quadraticCurveTo(512,0,512,123);cx.lineTo(512,389);cx.quadraticCurveTo(512,512,389,512);
-cx.lineTo(123,512);cx.quadraticCurveTo(0,512,0,389);cx.lineTo(0,123);cx.quadraticCurveTo(0,0,123,0);
-cx.closePath();cx.fill();
-cx.strokeStyle='#fff';cx.lineWidth=18;cx.lineCap='round';
-cx.beginPath();cx.moveTo(46,256);cx.quadraticCurveTo(256,46,466,256);cx.stroke();
-cx.beginPath();cx.moveTo(46,256);cx.quadraticCurveTo(256,466,466,256);cx.stroke();
-cx.fillStyle='#054f64';cx.fillRect(0,0,56,512);cx.fillRect(456,0,56,512);
-cx.fillStyle='#076880';cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.fill();
-cx.strokeStyle='#B5CAC1';cx.lineWidth=3.5;cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.stroke();
-cx.save();cx.translate(256,256);cx.rotate(-15*Math.PI/180);
-cx.strokeStyle='#B5CAC1';cx.lineWidth=4;cx.beginPath();cx.ellipse(0,0,155,40,0,0,Math.PI*2);cx.stroke();cx.restore();
-cx.fillStyle='#076880';cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.fill();
-cx.strokeStyle='#B5CAC1';cx.lineWidth=3.5;cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.stroke();
-document.getElementById('appIcon').href=cv.toDataURL('image/png');
+(function(){
+  var cv=document.createElement('canvas');cv.width=512;cv.height=512;
+  var cx=cv.getContext('2d');
+  cx.fillStyle='#054f64';cx.beginPath();cx.moveTo(123,0);cx.lineTo(389,0);
+  cx.quadraticCurveTo(512,0,512,123);cx.lineTo(512,389);cx.quadraticCurveTo(512,512,389,512);
+  cx.lineTo(123,512);cx.quadraticCurveTo(0,512,0,389);cx.lineTo(0,123);cx.quadraticCurveTo(0,0,123,0);
+  cx.closePath();cx.fill();
+  cx.strokeStyle='#fff';cx.lineWidth=18;cx.lineCap='round';
+  cx.beginPath();cx.moveTo(46,256);cx.quadraticCurveTo(256,46,466,256);cx.stroke();
+  cx.beginPath();cx.moveTo(46,256);cx.quadraticCurveTo(256,466,466,256);cx.stroke();
+  cx.fillStyle='#054f64';cx.fillRect(0,0,56,512);cx.fillRect(456,0,56,512);
+  cx.fillStyle='#076880';cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.fill();
+  cx.strokeStyle='#B5CAC1';cx.lineWidth=3.5;cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.stroke();
+  cx.save();cx.translate(256,256);cx.rotate(-15*Math.PI/180);
+  cx.strokeStyle='#B5CAC1';cx.lineWidth=4;cx.beginPath();cx.ellipse(0,0,155,40,0,0,Math.PI*2);cx.stroke();cx.restore();
+  cx.fillStyle='#076880';cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.fill();
+  cx.strokeStyle='#B5CAC1';cx.lineWidth=3.5;cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.stroke();
+  document.getElementById('appIcon').href=cv.toDataURL('image/png');
+  var ml=document.createElement('link');ml.rel='manifest';
+  ml.href=URL.createObjectURL(new Blob([JSON.stringify({name:"Mon Assistant",short_name:"Assistant",start_url:"/Assistant-vocal/",display:"standalone",background_color:"#054f64",theme_color:"#054f64"})],{type:'application/json'}));
+  document.head.appendChild(ml);
+})();
 
-// Manifest
-var ml=document.createElement('link');ml.rel='manifest';
-ml.href=URL.createObjectURL(new Blob([JSON.stringify({name:"Mon Assistant",short_name:"Assistant",start_url:"/Assistant-vocal/",display:"standalone",background_color:"#054f64",theme_color:"#054f64"})],{type:'application/json'}));
-document.head.appendChild(ml);
-
-// Init
 document.getElementById('dateDisplay').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 document.getElementById('addDate').value=new Date().toISOString().split('T')[0];
 
@@ -242,35 +263,6 @@ function switchTab(name){
   });
   if(name==='dashboard')loadDashboard();
   if(name==='profile')renderProfile();
-}
-
-function saveProfile(){
-  memory.profile={
-    nom:document.getElementById('pNom').value.trim(),
-    poste:document.getElementById('pPoste').value.trim(),
-    projets:document.getElementById('pProjets').value.trim(),
-    horaires:document.getElementById('pHoraires').value.trim()
-  };
-  saveMemory();
-  showToast('✅ Profil sauvegardé !');
-}
-
-function renderProfile(){
-  if(memory.profile.nom)document.getElementById('pNom').value=memory.profile.nom||'';
-  if(memory.profile.poste)document.getElementById('pPoste').value=memory.profile.poste||'';
-  if(memory.profile.projets)document.getElementById('pProjets').value=memory.profile.projets||'';
-  if(memory.profile.horaires)document.getElementById('pHoraires').value=memory.profile.horaires||'';
-  var hist=document.getElementById('historyList');
-  if(!memory.history.length){hist.innerHTML='<div class="empty">Aucun historique encore</div>';return;}
-  hist.innerHTML=memory.history.slice(-15).reverse().map(function(h){
-    return'<div class="card"><div class="card-title">'+h.titre+'</div>'
-      +'<div class="card-meta"><span class="badge b-'+(h.categorie||'travail')+'">'+(h.categorie||'travail')+'</span> · '+h.date+(h.heure?' · '+h.heure:'')+'</div></div>';
-  }).join('');
-}
-
-function clearHistory(){
-  memory.history=[];memory.patterns={};saveMemory();
-  renderProfile();showToast('✅ Historique effacé');
 }
 
 function toggleFocus(){
@@ -295,7 +287,9 @@ function initGA(){
       if(r.error){showToast('❌ '+r.error);return;}
       gToken=r.access_token;
       sessionStorage.setItem('g_token',gToken);
-      updateGBtn();showToast('✅ Google connecté !');loadDashboard();
+      updateGBtn();
+      showToast('✅ Google connecté !');
+      loadDashboard();
     }
   });
 }
@@ -315,11 +309,9 @@ function getListId(){
 
 function createCalendarEvent(titre,date,heure,cat){
   if(!gToken)return Promise.resolve(false);
-  var body=heure?{
-    summary:'['+cat+'] '+titre,
-    start:{dateTime:date+'T'+heure+':00',timeZone:'Europe/Paris'},
-    end:{dateTime:new Date(new Date(date+'T'+heure+':00').getTime()+3600000).toISOString().replace('Z',''),timeZone:'Europe/Paris'}
-  }:{summary:'['+cat+'] '+titre,start:{date:date},end:{date:date}};
+  var body=heure
+    ?{summary:'['+cat+'] '+titre,start:{dateTime:date+'T'+heure+':00',timeZone:'Europe/Paris'},end:{dateTime:new Date(new Date(date+'T'+heure+':00').getTime()+3600000).toISOString().replace('Z',''),timeZone:'Europe/Paris'}}
+    :{summary:'['+cat+'] '+titre,start:{date:date},end:{date:date}};
   return fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events',{
     method:'POST',headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},body:JSON.stringify(body)
   }).then(function(r){return r.ok;});
@@ -364,7 +356,7 @@ function addToTasks(){
 function hideEvent(id,dateStr){
   hiddenEvents[id]={until:dateStr};
   localStorage.setItem('hidden_events',JSON.stringify(hiddenEvents));
-  renderDashboard();
+  renderDashboard();renderWeekGrid();
 }
 
 function isHidden(id,dateStr){
@@ -390,71 +382,73 @@ function moveToCat(newCat){
   if(!selectedItemId)return;
   var item=allDashItems.find(function(it){return it.id===selectedItemId;});
   if(item)item.cat=newCat;
-  closeCatModal();
-  renderDashboard();
+  closeCatModal();renderDashboard();renderWeekGrid();
   showToast('✅ Déplacé vers '+newCat);
 }
 
-function renderWeekGrid(){
-  var grid=document.getElementById('weekGrid');
-  var today=new Date();
-  var todayISO=today.toISOString().split('T')[0];
-  var catColors={urgences:'#ff4757',travail:'#4a90d9',projets:'#B5CAC1',personnel:'#2ed573'};
-  var jours=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-  var html='';
-  for(var i=0;i<7;i++){
-    var d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+i);
-    var dISO=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    var dayItems=allDashItems.filter(function(it){
-      if(!it.date)return false;
-      var itDate=it.date.split('T')[0];
-      return itDate===dISO;
-    });
-    var isToday=dISO===todayISO;
-    var dots=dayItems.slice(0,4).map(function(it){
-      var col=catColors[it.cat]||'#B5CAC1';
-      return'<div class="week-dot" style="background:'+col+'"></div>';
-    }).join('');
-    html+='<div class="week-day'+(isToday?' today':'')+'" onclick="showWeekDay(\''+dISO+'\')">'
-      +'<div class="week-day-name">'+jours[d.getDay()]+'</div>'
-      +'<div class="week-day-num" style="color:'+(isToday?'#fff':'#B5CAC1')+'">'+d.getDate()+'</div>'
-      +dots
-      +'</div>';
-  }
-  grid.innerHTML=html;
+// Mémoire
+function saveMemory(){
+  localStorage.setItem('user_profile',JSON.stringify(memory.profile));
+  localStorage.setItem('task_history',JSON.stringify(memory.history.slice(-50)));
+  localStorage.setItem('patterns',JSON.stringify(memory.patterns));
 }
 
-function showWeekDay(dateISO){
-  var detail=document.getElementById('weekDetail');
-  var items=allDashItems.filter(function(it){
-    if(!it.date)return false;
-    return it.date.split('T')[0]===dateISO;
+function addToHistory(taches){
+  var today=new Date().toISOString().split('T')[0];
+  taches.forEach(function(t){
+    memory.history.push({date:today,titre:t.titre,categorie:t.categorie,heure:t.heure});
+    if(t.heure){
+      var key='jour_'+new Date().getDay()+'_'+t.categorie;
+      memory.patterns[key]=(memory.patterns[key]||0)+1;
+    }
   });
-  var d=new Date(dateISO+'T12:00:00');
-  var label=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-  if(!items.length){
-    detail.innerHTML='<div class="week-detail-title">'+label+'</div><div style="color:#B5CAC1;font-size:13px">Rien de prévu 🎉</div>';
-    detail.classList.add('visible');
-    return;
-  }
-  var catColors={urgences:'#ff4757',travail:'#4a90d9',projets:'#B5CAC1',personnel:'#2ed573'};
-  var html='<div class="week-detail-title">'+label+'</div>';
-  items.forEach(function(it){
-    var col=catColors[it.cat]||'#B5CAC1';
-    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'
-      +'<div style="width:7px;height:7px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
-      +'<div style="flex:1;font-size:13px">'+it.titre.replace(/\[.*?\]\s*/g,'')+'</div>'
-      +(it.heure?'<div style="font-size:11px;color:#B5CAC1">'+it.heure+'</div>':'')
-      +'</div>';
-  });
-  detail.innerHTML=html;
-  detail.classList.add('visible');
-  // Highlight la colonne sélectionnée
-  document.querySelectorAll('.week-day').forEach(function(el){el.classList.remove('selected');});
-  var idx=Math.round((new Date(dateISO+'T12:00:00')-new Date(new Date().toISOString().split('T')[0]+'T12:00:00'))/(1000*3600*24));
-  var days=document.querySelectorAll('.week-day');
-  if(days[idx])days[idx].classList.add('selected');
+  saveMemory();
 }
+
+function buildContext(){
+  var ctx='';
+  if(memory.profile.nom||memory.profile.projets){
+    ctx='CONTEXTE UTILISATEUR:\n';
+    if(memory.profile.nom)ctx+='Nom: '+memory.profile.nom+'\n';
+    if(memory.profile.poste)ctx+='Poste: '+memory.profile.poste+'\n';
+    if(memory.profile.projets)ctx+='Projets en cours: '+memory.profile.projets+'\n';
+    if(memory.profile.horaires)ctx+='Horaires: '+memory.profile.horaires+'\n';
+    if(memory.history.length){
+      ctx+='Tâches récentes: '+memory.history.slice(-8).map(function(h){return'"'+h.titre+'"('+h.date+')';}).join(', ')+'\n';
+    }
+  }
+  return ctx;
+}
+
+function saveProfile(){
+  memory.profile={
+    nom:document.getElementById('pNom').value.trim(),
+    poste:document.getElementById('pPoste').value.trim(),
+    projets:document.getElementById('pProjets').value.trim(),
+    horaires:document.getElementById('pHoraires').value.trim()
+  };
+  saveMemory();showToast('✅ Profil sauvegardé !');
+}
+
+function renderProfile(){
+  document.getElementById('pNom').value=memory.profile.nom||'';
+  document.getElementById('pPoste').value=memory.profile.poste||'';
+  document.getElementById('pProjets').value=memory.profile.projets||'';
+  document.getElementById('pHoraires').value=memory.profile.horaires||'';
+  var hist=document.getElementById('historyList');
+  if(!memory.history.length){hist.innerHTML='<div class="empty">Aucun historique</div>';return;}
+  hist.innerHTML=memory.history.slice(-15).reverse().map(function(h){
+    return'<div class="card"><div class="card-title">'+h.titre+'</div>'
+      +'<div class="card-meta"><span class="badge b-'+(h.categorie||'travail')+'">'+(h.categorie||'travail')+'</span> · '+h.date+'</div></div>';
+  }).join('');
+}
+
+function clearHistory(){
+  memory.history=[];memory.patterns={};saveMemory();renderProfile();showToast('✅ Effacé');
+}
+
+// Scores
+function computeScores(events){
   var scores={};
   var today=new Date();
   for(var i=0;i<3;i++){
@@ -476,6 +470,53 @@ function renderScores(scores){
   }).join('');
 }
 
+// Vue semaine
+function renderWeekGrid(){
+  var grid=document.getElementById('weekGrid');
+  var today=new Date();
+  var todayISO=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var jours=['Di','Lu','Ma','Me','Je','Ve','Sa'];
+  var html='';
+  for(var i=0;i<7;i++){
+    var d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+i);
+    var dISO=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    var dayItems=allDashItems.filter(function(it){return it.date&&it.date.split('T')[0]===dISO;});
+    var isToday=dISO===todayISO;
+    var dots=dayItems.slice(0,4).map(function(it){
+      return'<div class="wdot" style="background:'+(catColors[it.cat]||'#B5CAC1')+'"></div>';
+    }).join('');
+    html+='<div class="week-day'+(isToday?' today':'')+'" onclick="showWeekDay(\''+dISO+'\','+i+')">'
+      +'<div class="wdn">'+jours[d.getDay()]+'</div>'
+      +'<div class="wdd" style="color:'+(isToday?'#fff':'#B5CAC1')+'">'+d.getDate()+'</div>'
+      +dots+'</div>';
+  }
+  grid.innerHTML=html;
+}
+
+function showWeekDay(dateISO,idx){
+  var detail=document.getElementById('weekDetail');
+  var items=allDashItems.filter(function(it){return it.date&&it.date.split('T')[0]===dateISO;});
+  var d=new Date(dateISO+'T12:00:00');
+  var label=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  var html='<div class="wdt">'+label+'</div>';
+  if(!items.length){html+='<div style="color:#B5CAC1;font-size:13px">Rien de prévu 🎉</div>';}
+  else{
+    items.forEach(function(it){
+      var col=catColors[it.cat]||'#B5CAC1';
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'
+        +'<div style="width:7px;height:7px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
+        +'<div style="flex:1;font-size:13px">'+it.titre.replace(/\[.*?\]\s*/g,'')+'</div>'
+        +(it.heure?'<div style="font-size:11px;color:#B5CAC1">'+it.heure+'</div>':'')
+        +'</div>';
+    });
+  }
+  detail.innerHTML=html;detail.classList.add('visible');
+  document.querySelectorAll('.week-day').forEach(function(el){el.classList.remove('selected');});
+  var days=document.querySelectorAll('.week-day');
+  if(days[idx])days[idx].classList.add('selected');
+}
+
+// Dashboard
 function loadDashboard(){
   if(!gToken)return;
   var dash=document.getElementById('dashboard');
@@ -500,7 +541,7 @@ function loadDashboard(){
         }).concat((tD.items||[]).map(function(t){
           return{id:t.id,titre:t.title||'Sans titre',type:'task',date:t.due?t.due.split('T')[0]:'',heure:'',cat:''};
         }));
-        if(!allDashItems.length){dash.innerHTML='<div class="empty">Aucun élément 🎉</div>';return;}
+        if(!allDashItems.length){dash.innerHTML='<div class="empty">Aucun élément 🎉</div>';renderWeekGrid();return;}
         return fetch('https://api.groq.com/openai/v1/chat/completions',{
           method:'POST',
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
@@ -514,8 +555,7 @@ function loadDashboard(){
               entry[1].forEach(function(i){if(allDashItems[i])allDashItems[i].cat=entry[0];});
             });
           }catch(ex){}
-          renderDashboard();
-          renderWeekGrid();
+          renderDashboard();renderWeekGrid();
         });
       });
     });
@@ -527,7 +567,6 @@ function renderDashboard(){
   var dash=document.getElementById('dashboard');
   if(!allDashItems.length){dash.innerHTML='<div class="empty">Aucun élément 🎉</div>';return;}
   var catList=['urgences','travail','projets','personnel'];
-  var catLabels={urgences:'🚨 Urgences',travail:'💼 Travail',projets:'🚀 Projets',personnel:'👤 Personnel'};
   var html='';
   catList.forEach(function(cat){
     if(focusMode&&cat!=='urgences')return;
@@ -536,12 +575,11 @@ function renderDashboard(){
     html+='<div class="sec">'+catLabels[cat]+'</div>';
     items.forEach(function(it){
       var ds=it.date?new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}):'';
-      html+='<div class="card">'
-        +'<div style="display:flex;align-items:flex-start;gap:8px">'
+      html+='<div class="card"><div style="display:flex;align-items:flex-start;gap:8px">'
         +'<div style="flex:1;cursor:pointer" onclick="openCatModal(\''+it.id+'\')">'
         +'<div class="card-title">'+it.titre.replace(/\[.*?\]\s*/g,'')+'</div>'
         +'<div class="card-meta">'+(it.type==='event'?'📅':'✅')+' '+ds+(it.heure?' · '+it.heure:'')+'</div>'
-        +'<div style="font-size:10px;color:#B5CAC1;margin-top:3px">Appuyer pour déplacer</div>'
+        +'<div style="font-size:10px;color:#B5CAC1;margin-top:2px">Appuyer pour déplacer</div>'
         +'</div>'
         +'<button class="card-hide" onclick="hideEvent(\''+it.id+'\',\''+it.date+'\')">✕</button>'
         +'</div></div>';
@@ -551,40 +589,34 @@ function renderDashboard(){
   dash.innerHTML=html;
 }
 
+// Brief vocal
 function playBrief(){
   if(!gToken){showToast('⚠️ Connecte Google');return;}
   if(!allDashItems.length){showToast('⚠️ Charge le dashboard');return;}
   var days=parseInt(document.getElementById('briefDays').value);
-
-  // Déverrouille audio iOS dans le même tick utilisateur
   window.speechSynthesis.cancel();
   var sil=new SpeechSynthesisUtterance(' ');
   sil.volume=0.01;sil.lang='fr-FR';
   window.speechSynthesis.speak(sil);
-
   showToast('🤖 Génération...');
-  var cutoff=new Date();
-  cutoff.setDate(cutoff.getDate()+days);
+  var cutoff=new Date();cutoff.setDate(cutoff.getDate()+days);
   var items=allDashItems.filter(function(it){
     if(!it.date)return true;
     return new Date(it.date+'T12:00:00')<=cutoff;
   });
-
   var txt=items.map(function(it){
     return'"'+it.titre.replace(/\[.*?\]\s*/g,'')+'"'
       +(it.date?' le '+new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):'')
       +(it.heure?' à '+it.heure:'');
   }).join(', ');
-
   var prompt='Tu es une assistante personnelle directe et efficace.\n'
     +'Brief ULTRA court de '+days+' jours. RÈGLES :\n'
-    +'- Commence par 2-3 mots sur la charge (ex: Semaine tranquille. / Ça va chauffer. / Programme chargé.)\n'
+    +'- Commence par 2-3 mots sur la charge (ex: Semaine tranquille. / Programme chargé. / Journée intense.)\n'
     +'- Une phrase max par item, direct et concret\n'
-    +'- Zéro bonjour, zéro conseil, zéro introduction, zéro humour\n'
+    +'- Zéro bonjour, zéro conseil, zéro introduction\n'
     +'- Ton professionnel et bienveillant\n'
     +'- 5-7 phrases max\n'
     +'Éléments : '+txt+'.';
-
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
@@ -599,77 +631,21 @@ function speak(txt){
   if(!window.speechSynthesis)return;
   window.speechSynthesis.cancel();
   var spk=new SpeechSynthesisUtterance(txt);
-  // Voix féminine française — cherche dans l'ordre de préférence
-  var loadVoices=function(){
+  var trySpeak=function(){
     var voices=window.speechSynthesis.getVoices();
-    var voice=voices.find(function(v){return v.lang==='fr-FR'&&/marie|audrey|amélie|alice|thomas/i.test(v.name)&&/female|femme/i.test(v.name);})
-      ||voices.find(function(v){return v.lang==='fr-FR'&&/marie|audrey|amélie|alice/i.test(v.name);})
+    var voice=voices.find(function(v){return v.lang==='fr-FR'&&/marie|audrey|amélie|alice/i.test(v.name);})
       ||voices.find(function(v){return v.lang==='fr-FR'&&v.name!=='Thomas';})
       ||voices.find(function(v){return v.lang==='fr-FR';});
     if(voice)spk.voice=voice;
-    spk.lang='fr-FR';
-    spk.rate=0.88;
-    spk.pitch=1.15;
-    spk.volume=1;
+    spk.lang='fr-FR';spk.rate=0.88;spk.pitch=1.15;spk.volume=1;
     window.speechSynthesis.speak(spk);
   };
-  // Sur iOS les voix peuvent ne pas être chargées immédiatement
-  if(window.speechSynthesis.getVoices().length){
-    loadVoices();
-  } else {
-    window.speechSynthesis.onvoiceschanged=function(){loadVoices();window.speechSynthesis.onvoiceschanged=null;};
-  }
+  if(window.speechSynthesis.getVoices().length){trySpeak();}
+  else{window.speechSynthesis.onvoiceschanged=function(){trySpeak();window.speechSynthesis.onvoiceschanged=null;};}
 }
 
-// ── Mémoire contextuelle ──────────────────────────────────
-var memory={
-  profile: JSON.parse(localStorage.getItem('user_profile')||'{}'),
-  history: JSON.parse(localStorage.getItem('task_history')||'[]'),
-  patterns: JSON.parse(localStorage.getItem('patterns')||'{}')
-};
-
-function saveMemory(){
-  localStorage.setItem('user_profile',JSON.stringify(memory.profile));
-  localStorage.setItem('task_history',JSON.stringify(memory.history.slice(-50)));
-  localStorage.setItem('patterns',JSON.stringify(memory.patterns));
-}
-
-function addToHistory(taches){
-  var today=new Date().toISOString().split('T')[0];
-  taches.forEach(function(t){
-    memory.history.push({date:today,titre:t.titre,categorie:t.categorie,heure:t.heure});
-    // Détecte patterns jour/heure
-    if(t.heure){
-      var jour=new Date().getDay();
-      var key='jour_'+jour+'_'+t.categorie;
-      memory.patterns[key]=(memory.patterns[key]||0)+1;
-    }
-  });
-  saveMemory();
-}
-
-function buildContext(){
-  if(!memory.profile.nom&&!memory.history.length)return'';
-  var ctx='CONTEXTE UTILISATEUR:\n';
-  if(memory.profile.nom)ctx+='Nom: '+memory.profile.nom+'\n';
-  if(memory.profile.poste)ctx+='Poste: '+memory.profile.poste+'\n';
-  if(memory.profile.projets)ctx+='Projets en cours: '+memory.profile.projets+'\n';
-  if(memory.profile.horaires)ctx+='Horaires habituels: '+memory.profile.horaires+'\n';
-  if(memory.history.length){
-    var recent=memory.history.slice(-10);
-    ctx+='Tâches récentes: '+recent.map(function(h){return'"'+h.titre+'" ('+h.date+')';}).join(', ')+'\n';
-  }
-  // Patterns détectés
-  var topPatterns=Object.entries(memory.patterns).filter(function(e){return e[1]>=2;});
-  if(topPatterns.length){
-    ctx+='Habitudes détectées: '+ topPatterns.map(function(e){
-      var parts=e[0].split('_');
-      var jours=['dim','lun','mar','mer','jeu','ven','sam'];
-      return jours[parts[1]]+' souvent '+parts[2];
-    }).join(', ')+'\n';
-  }
-  return ctx;
-}
+// Micro
+var recognition=null,isRecording=false;
 
 function toggleRecording(){isRecording?stopRecording():startRecording();}
 
@@ -718,10 +694,8 @@ function analyzeWithGroq(transcript){
   document.getElementById('micBtn').classList.add('loading');
   document.getElementById('micBtn').textContent='⏳';
   document.getElementById('micLabel').textContent='Analyse...';
-
   var today=new Date();
   var todayISO=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-
   function nextDay(target){
     var d=new Date(today.getFullYear(),today.getMonth(),today.getDate());
     var diff=target-d.getDay();if(diff<=0)diff+=7;d.setDate(d.getDate()+diff);
@@ -730,7 +704,6 @@ function analyzeWithGroq(transcript){
   var tom=new Date(today.getFullYear(),today.getMonth(),today.getDate()+1);
   var tomISO=tom.getFullYear()+'-'+String(tom.getMonth()+1).padStart(2,'0')+'-'+String(tom.getDate()).padStart(2,'0');
   var daysMap={lundi:nextDay(1),mardi:nextDay(2),mercredi:nextDay(3),jeudi:nextDay(4),vendredi:nextDay(5),samedi:nextDay(6),dimanche:nextDay(0),demain:tomISO};
-
   var prompt=buildContext()
     +'Tu es un assistant personnel. Aujourd\'hui : '
     +today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
@@ -739,7 +712,6 @@ function analyzeWithGroq(transcript){
     +'\nMessage : "'+transcript+'"'
     +'\nUtilise EXACTEMENT ces dates. Catégorie : urgences|travail|projets|personnel. Sans jour → '+todayISO
     +'\nJSON uniquement : {"reponse":"2-3 phrases","taches":[{"titre":"","date":"YYYY-MM-DD","heure":"HH:MM ou vide","type":"urgent|normal|rappel","categorie":"urgences|travail|projets|personnel"}]}';
-
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
@@ -751,9 +723,9 @@ function analyzeWithGroq(transcript){
     var parsed=JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
     document.getElementById('responseText').textContent=parsed.reponse;
     document.getElementById('responseBox').classList.add('visible');
-    var todayList=document.getElementById('todayTasks');
-          if(parsed.taches&&parsed.taches.length){
-        addToHistory(parsed.taches);
+    if(parsed.taches&&parsed.taches.length){
+      addToHistory(parsed.taches);
+      var todayList=document.getElementById('todayTasks');
       if(!todayList.querySelector('.sec'))todayList.innerHTML='<div class="sec">Tâches ajoutées</div>';
       parsed.taches.forEach(function(tache){
         var cat=tache.categorie||'travail';
