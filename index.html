@@ -586,12 +586,17 @@ function analyzeWithGroq(transcript){
   .catch(function(err){showToast('❌ '+err.message);resetMic();});
 }
 
-function speak(text){
+function speak(txt){
   if(!window.speechSynthesis)return;
   window.speechSynthesis.cancel();
-  var u=new SpeechSynthesisUtterance(text);
-  u.lang='fr-FR';u.rate=1.05;
-  window.speechSynthesis.speak(u);
+  var voices=window.speechSynthesis.getVoices();
+  var spk=new SpeechSynthesisUtterance(txt);
+  var frVoice=voices.find(function(v){return v.lang==='fr-FR'&&v.name.includes('Marie');})
+    ||voices.find(function(v){return v.lang==='fr-FR'&&(v.name.includes('Amélie')||v.name.includes('Alice'));})
+    ||voices.find(function(v){return v.lang==='fr-FR';});
+  if(frVoice)spk.voice=frVoice;
+  spk.lang='fr-FR';spk.rate=1.05;spk.pitch=1.1;spk.volume=1;
+  window.speechSynthesis.speak(spk);
 }
 </script>
 </body>
