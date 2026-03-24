@@ -104,9 +104,10 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 </header>
 
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('vocal')">🎙️ Vocal</div>
-  <div class="tab" onclick="switchTab('dashboard')">📊 Dashboard</div>
-  <div class="tab" onclick="switchTab('add')">➕ Ajouter</div>
+  <div class="tab active" onclick="switchTab('vocal')">🎙️</div>
+  <div class="tab" onclick="switchTab('dashboard')">📊</div>
+  <div class="tab" onclick="switchTab('add')">➕</div>
+  <div class="tab" onclick="switchTab('profile')">👤</div>
 </div>
 
 <div class="page active" id="page-vocal">
@@ -159,7 +160,19 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
   </div>
 </div>
 
-<div class="overlay" id="overlay" onclick="closeCatModal()"></div>
+<div class="page" id="page-profile">
+  <div class="sec">Mon profil — contexte pour l'IA</div>
+  <div class="add-form">
+    <input type="text" id="pNom" placeholder="Ton prénom..."/>
+    <input type="text" id="pPoste" placeholder="Ton poste / rôle..."/>
+    <input type="text" id="pProjets" placeholder="Projets en cours (ex: Projet Lima, M&A ROTRANS...)"/>
+    <input type="text" id="pHoraires" placeholder="Horaires (ex: 8h-19h, pause déj 13h)"/>
+    <button class="btn-ash" style="width:100%" onclick="saveProfile()">💾 Sauvegarder mon profil</button>
+  </div>
+  <div class="sec">Historique récent</div>
+  <div id="historyList"></div>
+  <button onclick="clearHistory()" style="background:none;border:1px solid rgba(255,71,87,0.4);border-radius:10px;padding:8px 16px;font-size:12px;color:#ff8f9a;cursor:pointer;width:100%;margin-top:8px">🗑️ Effacer l'historique</button>
+</div>
 <div class="cat-modal" id="catModal">
   <h3>Déplacer vers...</h3>
   <div class="cat-opts">
@@ -219,12 +232,42 @@ function showToast(msg){
 }
 
 function switchTab(name){
-  var pages=['vocal','dashboard','add'];
+  var pages=['vocal','dashboard','add','profile'];
   pages.forEach(function(p,i){
     document.querySelectorAll('.tab')[i].classList.toggle('active',p===name);
     document.getElementById('page-'+p).classList.toggle('active',p===name);
   });
   if(name==='dashboard')loadDashboard();
+  if(name==='profile')renderProfile();
+}
+
+function saveProfile(){
+  memory.profile={
+    nom:document.getElementById('pNom').value.trim(),
+    poste:document.getElementById('pPoste').value.trim(),
+    projets:document.getElementById('pProjets').value.trim(),
+    horaires:document.getElementById('pHoraires').value.trim()
+  };
+  saveMemory();
+  showToast('✅ Profil sauvegardé !');
+}
+
+function renderProfile(){
+  if(memory.profile.nom)document.getElementById('pNom').value=memory.profile.nom||'';
+  if(memory.profile.poste)document.getElementById('pPoste').value=memory.profile.poste||'';
+  if(memory.profile.projets)document.getElementById('pProjets').value=memory.profile.projets||'';
+  if(memory.profile.horaires)document.getElementById('pHoraires').value=memory.profile.horaires||'';
+  var hist=document.getElementById('historyList');
+  if(!memory.history.length){hist.innerHTML='<div class="empty">Aucun historique encore</div>';return;}
+  hist.innerHTML=memory.history.slice(-15).reverse().map(function(h){
+    return'<div class="card"><div class="card-title">'+h.titre+'</div>'
+      +'<div class="card-meta"><span class="badge b-'+(h.categorie||'travail')+'">'+(h.categorie||'travail')+'</span> · '+h.date+(h.heure?' · '+h.heure:'')+'</div></div>';
+  }).join('');
+}
+
+function clearHistory(){
+  memory.history=[];memory.patterns={};saveMemory();
+  renderProfile();showToast('✅ Historique effacé');
 }
 
 function toggleFocus(){
@@ -470,12 +513,12 @@ function playBrief(){
       +(it.heure?' à '+it.heure:'');
   }).join(', ');
 
-  var prompt='Tu es une assistante personnelle directe, efficace, légèrement humoristique.\n'
+  var prompt='Tu es une assistante personnelle directe et efficace.\n'
     +'Brief ULTRA court de '+days+' jours. RÈGLES :\n'
-    +'- Commence par 2-3 mots sur la charge (ex: Semaine tranquille. / Ça va chauffer. / Accroche-toi.)\n'
+    +'- Commence par 2-3 mots sur la charge (ex: Semaine tranquille. / Ça va chauffer. / Programme chargé.)\n'
     +'- Une phrase max par item, direct et concret\n'
-    +'- Zéro bonjour, zéro conseil, zéro introduction\n'
-    +'- Humour subtil OK\n'
+    +'- Zéro bonjour, zéro conseil, zéro introduction, zéro humour\n'
+    +'- Ton professionnel et bienveillant\n'
     +'- 5-7 phrases max\n'
     +'Éléments : '+txt+'.';
 
@@ -493,16 +536,77 @@ function speak(txt){
   if(!window.speechSynthesis)return;
   window.speechSynthesis.cancel();
   var spk=new SpeechSynthesisUtterance(txt);
-  var voices=window.speechSynthesis.getVoices();
-  var voice=voices.find(function(v){return v.lang==='fr-FR'&&v.name.includes('Marie');})
-    ||voices.find(function(v){return v.lang==='fr-FR'&&(v.name.includes('Amélie')||v.name.includes('Alice'));})
-    ||voices.find(function(v){return v.lang==='fr-FR';});
-  if(voice)spk.voice=voice;
-  spk.lang='fr-FR';spk.rate=1.05;spk.pitch=1.1;spk.volume=1;
-  window.speechSynthesis.speak(spk);
+  // Voix féminine française — cherche dans l'ordre de préférence
+  var loadVoices=function(){
+    var voices=window.speechSynthesis.getVoices();
+    var voice=voices.find(function(v){return v.lang==='fr-FR'&&/marie|audrey|amélie|alice|thomas/i.test(v.name)&&/female|femme/i.test(v.name);})
+      ||voices.find(function(v){return v.lang==='fr-FR'&&/marie|audrey|amélie|alice/i.test(v.name);})
+      ||voices.find(function(v){return v.lang==='fr-FR'&&v.name!=='Thomas';})
+      ||voices.find(function(v){return v.lang==='fr-FR';});
+    if(voice)spk.voice=voice;
+    spk.lang='fr-FR';
+    spk.rate=0.88;
+    spk.pitch=1.15;
+    spk.volume=1;
+    window.speechSynthesis.speak(spk);
+  };
+  // Sur iOS les voix peuvent ne pas être chargées immédiatement
+  if(window.speechSynthesis.getVoices().length){
+    loadVoices();
+  } else {
+    window.speechSynthesis.onvoiceschanged=function(){loadVoices();window.speechSynthesis.onvoiceschanged=null;};
+  }
 }
 
-var recognition=null,isRecording=false;
+// ── Mémoire contextuelle ──────────────────────────────────
+var memory={
+  profile: JSON.parse(localStorage.getItem('user_profile')||'{}'),
+  history: JSON.parse(localStorage.getItem('task_history')||'[]'),
+  patterns: JSON.parse(localStorage.getItem('patterns')||'{}')
+};
+
+function saveMemory(){
+  localStorage.setItem('user_profile',JSON.stringify(memory.profile));
+  localStorage.setItem('task_history',JSON.stringify(memory.history.slice(-50)));
+  localStorage.setItem('patterns',JSON.stringify(memory.patterns));
+}
+
+function addToHistory(taches){
+  var today=new Date().toISOString().split('T')[0];
+  taches.forEach(function(t){
+    memory.history.push({date:today,titre:t.titre,categorie:t.categorie,heure:t.heure});
+    // Détecte patterns jour/heure
+    if(t.heure){
+      var jour=new Date().getDay();
+      var key='jour_'+jour+'_'+t.categorie;
+      memory.patterns[key]=(memory.patterns[key]||0)+1;
+    }
+  });
+  saveMemory();
+}
+
+function buildContext(){
+  if(!memory.profile.nom&&!memory.history.length)return'';
+  var ctx='CONTEXTE UTILISATEUR:\n';
+  if(memory.profile.nom)ctx+='Nom: '+memory.profile.nom+'\n';
+  if(memory.profile.poste)ctx+='Poste: '+memory.profile.poste+'\n';
+  if(memory.profile.projets)ctx+='Projets en cours: '+memory.profile.projets+'\n';
+  if(memory.profile.horaires)ctx+='Horaires habituels: '+memory.profile.horaires+'\n';
+  if(memory.history.length){
+    var recent=memory.history.slice(-10);
+    ctx+='Tâches récentes: '+recent.map(function(h){return'"'+h.titre+'" ('+h.date+')';}).join(', ')+'\n';
+  }
+  // Patterns détectés
+  var topPatterns=Object.entries(memory.patterns).filter(function(e){return e[1]>=2;});
+  if(topPatterns.length){
+    ctx+='Habitudes détectées: '+ topPatterns.map(function(e){
+      var parts=e[0].split('_');
+      var jours=['dim','lun','mar','mer','jeu','ven','sam'];
+      return jours[parts[1]]+' souvent '+parts[2];
+    }).join(', ')+'\n';
+  }
+  return ctx;
+}
 
 function toggleRecording(){isRecording?stopRecording():startRecording();}
 
@@ -564,7 +668,8 @@ function analyzeWithGroq(transcript){
   var tomISO=tom.getFullYear()+'-'+String(tom.getMonth()+1).padStart(2,'0')+'-'+String(tom.getDate()).padStart(2,'0');
   var daysMap={lundi:nextDay(1),mardi:nextDay(2),mercredi:nextDay(3),jeudi:nextDay(4),vendredi:nextDay(5),samedi:nextDay(6),dimanche:nextDay(0),demain:tomISO};
 
-  var prompt='Tu es un assistant personnel. Aujourd\'hui : '
+  var prompt=buildContext()
+    +'Tu es un assistant personnel. Aujourd\'hui : '
     +today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
     +' ('+todayISO+')\nDates EXACTES : '
     +Object.entries(daysMap).map(function(e){return'"'+e[0]+'":'+e[1];}).join(', ')
@@ -584,7 +689,8 @@ function analyzeWithGroq(transcript){
     document.getElementById('responseText').textContent=parsed.reponse;
     document.getElementById('responseBox').classList.add('visible');
     var todayList=document.getElementById('todayTasks');
-    if(parsed.taches&&parsed.taches.length){
+          if(parsed.taches&&parsed.taches.length){
+        addToHistory(parsed.taches);
       if(!todayList.querySelector('.sec'))todayList.innerHTML='<div class="sec">Tâches ajoutées</div>';
       parsed.taches.forEach(function(tache){
         var cat=tache.categorie||'travail';
