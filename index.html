@@ -36,8 +36,8 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 .card-title{font-size:14px;font-weight:500;margin-bottom:3px}
 .card-meta{font-size:12px;color:#B5CAC1}
 .card-hide{background:none;border:none;font-size:15px;cursor:pointer;color:#B5CAC1;padding:0;line-height:1;flex-shrink:0}
-.sec{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#B5CAC1;margin:16px 0 8px;display:flex;align-items:center;justify-content:space-between}
-.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;margin-right:5px;text-transform:uppercase;letter-spacing:0.05em}
+.sec{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#B5CAC1;margin:16px 0 8px}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;margin-right:5px;text-transform:uppercase}
 .b-urgences{background:rgba(255,71,87,0.25);color:#ff8f9a}
 .b-travail{background:rgba(74,144,217,0.25);color:#7ab8f5}
 .b-projets{background:rgba(181,202,193,0.2);color:#B5CAC1}
@@ -46,11 +46,11 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 .d-urgences{background:#ff4757}.d-travail{background:#4a90d9}.d-projets{background:#B5CAC1}.d-personnel{background:#2ed573}
 .score-bar{display:flex;gap:8px;margin-bottom:14px}
 .score-day{flex:1;background:#043d4f;border:1px solid rgba(181,202,193,0.2);border-radius:10px;padding:10px 8px;text-align:center}
-.score-day .day-name{font-size:11px;color:#B5CAC1;margin-bottom:4px}
-.score-day .day-score{font-size:18px}
-.score-day .day-label{font-size:10px;margin-top:2px}
-.score-light{color:#2ed573}.score-medium{color:#f39c12}.score-heavy{color:#ff4757}
-.focus-btn{display:flex;align-items:center;gap:8px;background:#043d4f;border:1px solid rgba(181,202,193,0.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;cursor:pointer;font-size:13px}
+.score-day .dn{font-size:11px;color:#B5CAC1;margin-bottom:4px}
+.score-day .ds{font-size:18px}
+.score-day .dl{font-size:10px;margin-top:2px}
+.sl{color:#2ed573}.sm{color:#f39c12}.sh{color:#ff4757}
+.focus-btn{display:flex;align-items:center;gap:8px;background:#043d4f;border:1px solid rgba(181,202,193,0.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;cursor:pointer}
 .toggle{width:36px;height:20px;background:#076880;border-radius:10px;position:relative;flex-shrink:0;transition:background 0.2s}
 .toggle.on{background:#ff4757}
 .toggle::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left 0.2s}
@@ -61,25 +61,23 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 .add-form{background:#043d4f;border:1px solid rgba(181,202,193,0.25);border-radius:14px;padding:15px;margin-bottom:14px}
 .add-form input,.add-form select{width:100%;background:#076880;border:1px solid rgba(181,202,193,0.35);border-radius:10px;padding:10px 13px;font-size:14px;outline:none;margin-bottom:9px}
 .add-form select option{background:#054f64}
-.add-form .row{display:flex;gap:8px;margin-bottom:9px}
-.add-form .row input{margin-bottom:0}
-.add-form .actions{display:flex;gap:8px}
-.add-form .actions button{flex:1}
-.check{width:20px;height:20px;border-radius:50%;border:2px solid #B5CAC1;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:font-size:10px;margin-left:auto;transition:all 0.2s}
+.add-form .arow{display:flex;gap:8px;margin-bottom:9px}
+.add-form .arow input{margin-bottom:0}
+.add-form .acts{display:flex;gap:8px}
+.add-form .acts button{flex:1}
+.check{width:20px;height:20px;border-radius:50%;border:2px solid #B5CAC1;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;margin-left:auto;transition:all 0.2s}
 .check.done{background:#B5CAC1;color:#054f64}
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#076880;border:1px solid #B5CAC1;border-radius:20px;padding:9px 18px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;z-index:999}
 .toast.show{opacity:1}
-.row-flex{display:flex;align-items:flex-start;gap:10px}
+.rflex{display:flex;align-items:flex-start;gap:10px}
 .empty{color:#B5CAC1;text-align:center;padding:24px;font-size:14px;line-height:1.7}
-/* Modal catégorie */
 .cat-modal{position:fixed;bottom:0;left:0;right:0;background:#043d4f;border-top:1px solid rgba(181,202,193,0.3);border-radius:20px 20px 0 0;padding:20px;z-index:1000;transform:translateY(100%);transition:transform 0.3s ease}
 .cat-modal.open{transform:translateY(0)}
 .cat-modal h3{font-size:14px;color:#B5CAC1;margin-bottom:14px;text-align:center}
-.cat-modal-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cat-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .cat-opt{background:#076880;border:1px solid rgba(181,202,193,0.3);border-radius:10px;padding:12px;text-align:center;font-size:14px;cursor:pointer}
-.cat-opt.active{border-color:#B5CAC1;background:#054f64}
-.cat-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none}
-.cat-modal-overlay.open{display:block}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none}
+.overlay.open{display:block}
 </style>
 </head>
 <body>
@@ -111,7 +109,6 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
   <div class="tab" onclick="switchTab('add')">➕ Ajouter</div>
 </div>
 
-<!-- VOCAL -->
 <div class="page active" id="page-vocal">
   <button class="btn" id="msBtn" onclick="signInGoogle()">🔗 Connecter Google</button>
   <div class="mic-area">
@@ -123,40 +120,49 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
   <div id="todayTasks"></div>
 </div>
 
-<!-- DASHBOARD -->
 <div class="page" id="page-dashboard">
   <div class="focus-btn" onclick="toggleFocus()">
-    <div style="flex:1"><div style="font-weight:500">🎯 Mode Focus</div><div style="font-size:11px;color:#B5CAC1;margin-top:2px">Urgences uniquement</div></div>
+    <div style="flex:1"><div style="font-weight:500;font-size:13px">🎯 Mode Focus — Urgences uniquement</div></div>
     <div class="toggle" id="focusToggle"></div>
   </div>
   <div class="sec">Charge des prochains jours</div>
   <div class="score-bar" id="scoreBar"></div>
   <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
-    <select id="briefDays" style="flex:1;background:#043d4f;border:1px solid rgba(181,202,193,0.3);border-radius:10px;padding:9px 12px;font-size:13px;outline:none;color:#fff;-webkit-appearance:none">
+    <select id="briefDays" style="flex:1;background:#043d4f;border:1px solid rgba(181,202,193,0.3);border-radius:10px;padding:9px 12px;font-size:13px;outline:none;-webkit-appearance:none">
       <option value="3">📅 3 prochains jours</option>
       <option value="7">📅 7 prochains jours</option>
     </select>
-    <button onclick="playBrief()" style="background:#B5CAC1;border:none;border-radius:10px;padding:10px 14px;font-size:13px;cursor:pointer;color:#054f64;font-weight:600;white-space:nowrap">🔊 Brief</button>
-    <button onclick="loadDashboard()" style="background:#076880;border:1px solid rgba(181,202,193,0.4);border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer">🔄</button>
+    <button onclick="playBrief()" style="background:#B5CAC1;border:none;border-radius:10px;padding:10px 14px;font-size:13px;cursor:pointer;color:#054f64;font-weight:600;white-space:nowrap;flex-shrink:0">🔊 Brief</button>
+    <button onclick="loadDashboard()" style="background:#076880;border:1px solid rgba(181,202,193,0.4);border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;flex-shrink:0">🔄</button>
   </div>
   <div id="dashboard"><div class="empty">Connecte Google pour voir ton dashboard</div></div>
 </div>
 
-<!-- AJOUTER -->
 <div class="page" id="page-add">
   <div class="sec">Ajouter manuellement</div>
   <div class="add-form">
     <input type="text" id="addTitle" placeholder="Titre..."/>
-    <select id="addCat"><option value="travail">💼 Travail</option><option value="personnel">👤 Personnel</option><option value="projets">🚀 Projets</option><option value="urgences">🚨 Urgences</option></select>
-    <div class="row"><input type="date" id="addDate" style="flex:1"/><input type="time" id="addTime" style="flex:1"/></div>
-    <div class="actions"><button class="btn-ash" onclick="addToCalendar()">📅 Calendar</button><button class="btn-ash" onclick="addToTasks()">✅ Tasks</button></div>
+    <select id="addCat">
+      <option value="travail">💼 Travail</option>
+      <option value="personnel">👤 Personnel</option>
+      <option value="projets">🚀 Projets</option>
+      <option value="urgences">🚨 Urgences</option>
+    </select>
+    <div class="arow">
+      <input type="date" id="addDate" style="flex:1"/>
+      <input type="time" id="addTime" style="flex:1"/>
+    </div>
+    <div class="acts">
+      <button class="btn-ash" onclick="addToCalendar()">📅 Calendar</button>
+      <button class="btn-ash" onclick="addToTasks()">✅ Tasks</button>
+    </div>
   </div>
 </div>
 
-<div class="cat-modal-overlay" id="catOverlay" onclick="closeCatModal()"></div>
+<div class="overlay" id="overlay" onclick="closeCatModal()"></div>
 <div class="cat-modal" id="catModal">
   <h3>Déplacer vers...</h3>
-  <div class="cat-modal-opts">
+  <div class="cat-opts">
     <div class="cat-opt" onclick="moveToCat('urgences')">🚨 Urgences</div>
     <div class="cat-opt" onclick="moveToCat('travail')">💼 Travail</div>
     <div class="cat-opt" onclick="moveToCat('projets')">🚀 Projets</div>
@@ -176,8 +182,9 @@ var focusMode=false;
 var hiddenEvents=JSON.parse(localStorage.getItem('hidden_events')||'{}');
 var allDashItems=[];
 var cachedListId=null;
+var selectedItemId=null;
 
-// Icône PWA
+// PWA icon
 var cv=document.createElement('canvas');cv.width=512;cv.height=512;
 var cx=cv.getContext('2d');
 cx.fillStyle='#054f64';cx.beginPath();cx.moveTo(123,0);cx.lineTo(389,0);
@@ -190,16 +197,18 @@ cx.beginPath();cx.moveTo(46,256);cx.quadraticCurveTo(256,466,466,256);cx.stroke(
 cx.fillStyle='#054f64';cx.fillRect(0,0,56,512);cx.fillRect(456,0,56,512);
 cx.fillStyle='#076880';cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.fill();
 cx.strokeStyle='#B5CAC1';cx.lineWidth=3.5;cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.stroke();
-cx.save();cx.translate(256,256);cx.rotate(-15*Math.PI/180);cx.strokeStyle='#B5CAC1';cx.lineWidth=4;
-cx.beginPath();cx.ellipse(0,0,155,40,0,0,Math.PI*2);cx.stroke();cx.restore();
+cx.save();cx.translate(256,256);cx.rotate(-15*Math.PI/180);
+cx.strokeStyle='#B5CAC1';cx.lineWidth=4;cx.beginPath();cx.ellipse(0,0,155,40,0,0,Math.PI*2);cx.stroke();cx.restore();
 cx.fillStyle='#076880';cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.fill();
 cx.strokeStyle='#B5CAC1';cx.lineWidth=3.5;cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.stroke();
 document.getElementById('appIcon').href=cv.toDataURL('image/png');
 
+// Manifest
 var ml=document.createElement('link');ml.rel='manifest';
 ml.href=URL.createObjectURL(new Blob([JSON.stringify({name:"Mon Assistant",short_name:"Assistant",start_url:"/Assistant-vocal/",display:"standalone",background_color:"#054f64",theme_color:"#054f64"})],{type:'application/json'}));
 document.head.appendChild(ml);
 
+// Init
 document.getElementById('dateDisplay').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 document.getElementById('addDate').value=new Date().toISOString().split('T')[0];
 
@@ -225,7 +234,10 @@ function toggleFocus(){
 }
 
 function updateGBtn(){
-  if(gToken){document.getElementById('msBtn').textContent='✅ Google connecté';document.getElementById('msBtn').style.background='#076880';}
+  if(gToken){
+    document.getElementById('msBtn').textContent='✅ Google connecté';
+    document.getElementById('msBtn').style.background='#076880';
+  }
 }
 updateGBtn();
 
@@ -235,14 +247,18 @@ function initGA(){
     client_id:G_CLIENT_ID,scope:G_SCOPES,
     callback:function(r){
       if(r.error){showToast('❌ '+r.error);return;}
-      gToken=r.access_token;sessionStorage.setItem('g_token',gToken);
+      gToken=r.access_token;
+      sessionStorage.setItem('g_token',gToken);
       updateGBtn();showToast('✅ Google connecté !');loadDashboard();
     }
   });
 }
 initGA();
 
-function signInGoogle(){if(!tokenClient){showToast('⏳ Chargement...');return;}tokenClient.requestAccessToken();}
+function signInGoogle(){
+  if(!tokenClient){showToast('⏳ Chargement...');return;}
+  tokenClient.requestAccessToken();
+}
 
 function getListId(){
   if(cachedListId)return Promise.resolve(cachedListId);
@@ -253,12 +269,11 @@ function getListId(){
 
 function createCalendarEvent(titre,date,heure,cat){
   if(!gToken)return Promise.resolve(false);
-  var label='['+cat+'] '+titre;
   var body=heure?{
-    summary:label,
+    summary:'['+cat+'] '+titre,
     start:{dateTime:date+'T'+heure+':00',timeZone:'Europe/Paris'},
     end:{dateTime:new Date(new Date(date+'T'+heure+':00').getTime()+3600000).toISOString().replace('Z',''),timeZone:'Europe/Paris'}
-  }:{summary:label,start:{date:date},end:{date:date}};
+  }:{summary:'['+cat+'] '+titre,start:{date:date},end:{date:date}};
   return fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events',{
     method:'POST',headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},body:JSON.stringify(body)
   }).then(function(r){return r.ok;});
@@ -313,32 +328,25 @@ function isHidden(id,dateStr){
   return true;
 }
 
-var selectedItemId=null;
-
 function openCatModal(id){
   selectedItemId=id;
   document.getElementById('catModal').classList.add('open');
-  document.getElementById('catOverlay').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
 }
 
 function closeCatModal(){
   document.getElementById('catModal').classList.remove('open');
-  document.getElementById('catOverlay').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
   selectedItemId=null;
 }
 
 function moveToCat(newCat){
   if(!selectedItemId)return;
   var item=allDashItems.find(function(it){return it.id===selectedItemId;});
-  if(item){item.cat=newCat;}
+  if(item)item.cat=newCat;
   closeCatModal();
   renderDashboard();
   showToast('✅ Déplacé vers '+newCat);
-}
-
-function changeCat(id,newCat){
-  var item=allDashItems.find(function(it){return it.id===id;});
-  if(item){item.cat=newCat;renderDashboard();}
 }
 
 function computeScores(events){
@@ -346,21 +354,20 @@ function computeScores(events){
   var today=new Date();
   for(var i=0;i<3;i++){
     var d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+i);
-    var dStr=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    var count=events.filter(function(e){return(e.start.dateTime||e.start.date||'').startsWith(dStr);}).length;
-    scores[dStr]={count:count,label:d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'})};
+    var ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    var cnt=events.filter(function(e){return(e.start.dateTime||e.start.date||'').startsWith(ds);}).length;
+    scores[ds]={count:cnt,label:d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'})};
   }
   return scores;
 }
 
 function renderScores(scores){
-  var bar=document.getElementById('scoreBar');
-  bar.innerHTML=Object.entries(scores).map(function(entry){
-    var count=entry[1].count,label=entry[1].label;
-    var cls=count<=1?'score-light':count<=3?'score-medium':'score-heavy';
-    var emoji=count<=1?'🟢':count<=3?'🟡':'🔴';
-    var txt=count<=1?'Léger':count<=3?'Chargé':'Surchargé';
-    return'<div class="score-day"><div class="day-name">'+label+'</div><div class="day-score">'+emoji+'</div><div class="day-label '+cls+'">'+txt+'</div></div>';
+  document.getElementById('scoreBar').innerHTML=Object.entries(scores).map(function(entry){
+    var cnt=entry[1].count,lbl=entry[1].label;
+    var cls=cnt<=1?'sl':cnt<=3?'sm':'sh';
+    var em=cnt<=1?'🟢':cnt<=3?'🟡':'🔴';
+    var txt=cnt<=1?'Léger':cnt<=3?'Chargé':'Surchargé';
+    return'<div class="score-day"><div class="dn">'+lbl+'</div><div class="ds">'+em+'</div><div class="dl '+cls+'">'+txt+'</div></div>';
   }).join('');
 }
 
@@ -381,12 +388,14 @@ function loadDashboard(){
         {headers:{'Authorization':'Bearer '+gToken}})
       .then(function(r){return r.json();})
       .then(function(tD){
-        var tasks=tD.items||[];
-        allDashItems=events.map(function(e){return{id:e.id,titre:e.summary||'Sans titre',type:'event',date:e.start.dateTime||e.start.date,heure:e.start.dateTime?new Date(e.start.dateTime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'',cat:''};})
-          .concat(tasks.map(function(t){return{id:t.id,titre:t.title||'Sans titre',type:'task',date:t.due?t.due.split('T')[0]:'',heure:'',cat:''};}));
-
+        allDashItems=events.map(function(e){
+          return{id:e.id,titre:e.summary||'Sans titre',type:'event',
+            date:e.start.dateTime||e.start.date,
+            heure:e.start.dateTime?new Date(e.start.dateTime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'',cat:''};
+        }).concat((tD.items||[]).map(function(t){
+          return{id:t.id,titre:t.title||'Sans titre',type:'task',date:t.due?t.due.split('T')[0]:'',heure:'',cat:''};
+        }));
         if(!allDashItems.length){dash.innerHTML='<div class="empty">Aucun élément 🎉</div>';return;}
-
         return fetch('https://api.groq.com/openai/v1/chat/completions',{
           method:'POST',
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
@@ -397,36 +406,37 @@ function loadDashboard(){
           try{
             var cats=JSON.parse(aiD.choices[0].message.content.replace(/```json|```/g,'').trim());
             Object.entries(cats).forEach(function(entry){
-              var cat=entry[0],idxs=entry[1];
-              idxs.forEach(function(i){if(allDashItems[i])allDashItems[i].cat=cat;});
+              entry[1].forEach(function(i){if(allDashItems[i])allDashItems[i].cat=entry[0];});
             });
-          }catch(e){}
+          }catch(ex){}
           renderDashboard();
         });
       });
     });
   })
-  .catch(function(e){dash.innerHTML='<div class="empty">Erreur : '+e.message+'</div>';});
+  .catch(function(e){document.getElementById('dashboard').innerHTML='<div class="empty">Erreur : '+e.message+'</div>';});
 }
 
 function renderDashboard(){
   var dash=document.getElementById('dashboard');
   if(!allDashItems.length){dash.innerHTML='<div class="empty">Aucun élément 🎉</div>';return;}
-  var cats=['urgences','travail','projets','personnel'];
+  var catList=['urgences','travail','projets','personnel'];
   var catLabels={urgences:'🚨 Urgences',travail:'💼 Travail',projets:'🚀 Projets',personnel:'👤 Personnel'};
-  var catOpts={urgences:'🚨 Urgences',travail:'💼 Travail',projets:'🚀 Projets',personnel:'👤 Personnel'};
   var html='';
-  cats.forEach(function(cat){
+  catList.forEach(function(cat){
     if(focusMode&&cat!=='urgences')return;
     var items=allDashItems.filter(function(it){return it.cat===cat&&!isHidden(it.id,it.date);});
     if(!items.length)return;
     html+='<div class="sec">'+catLabels[cat]+'</div>';
     items.forEach(function(it){
-      var dateStr=it.date?new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}):'';
-      html+='<div class="card"><div style="display:flex;align-items:flex-start;gap:8px">'
-        +'<div style="flex:1" onclick="openCatModal(\''+it.id+'\')" style="cursor:pointer"><div class="card-title">'+it.titre.replace(/\[.*?\]\s*/g,'')+'</div>'
-        +'<div class="card-meta">'+(it.type==='event'?'📅':'✅')+' '+dateStr+(it.heure?' · '+it.heure:'')+'</div>'
-        +'<div style="font-size:11px;color:#B5CAC1;margin-top:4px">Appuie pour déplacer ↕</div></div>'
+      var ds=it.date?new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}):'';
+      html+='<div class="card">'
+        +'<div style="display:flex;align-items:flex-start;gap:8px">'
+        +'<div style="flex:1;cursor:pointer" onclick="openCatModal(\''+it.id+'\')">'
+        +'<div class="card-title">'+it.titre.replace(/\[.*?\]\s*/g,'')+'</div>'
+        +'<div class="card-meta">'+(it.type==='event'?'📅':'✅')+' '+ds+(it.heure?' · '+it.heure:'')+'</div>'
+        +'<div style="font-size:10px;color:#B5CAC1;margin-top:3px">Appuyer pour déplacer</div>'
+        +'</div>'
         +'<button class="card-hide" onclick="hideEvent(\''+it.id+'\',\''+it.date+'\')">✕</button>'
         +'</div></div>';
     });
@@ -435,50 +445,61 @@ function renderDashboard(){
   dash.innerHTML=html;
 }
 
-// Brief vocal — pré-déverrouille l'audio au tap, puis parle
 function playBrief(){
   if(!gToken){showToast('⚠️ Connecte Google');return;}
-  if(!allDashItems.length){showToast('⚠️ Charge le dashboard d\'abord');return;}
-  var days=document.getElementById('briefDays').value;
+  if(!allDashItems.length){showToast('⚠️ Charge le dashboard');return;}
+  var days=parseInt(document.getElementById('briefDays').value);
 
-  // Déverrouille audio iOS immédiatement dans le même tick
+  // Déverrouille audio iOS dans le même tick utilisateur
   window.speechSynthesis.cancel();
-  var silence=new SpeechSynthesisUtterance(' ');
-  silence.volume=0.01;silence.lang='fr-FR';
-  window.speechSynthesis.speak(silence);
+  var sil=new SpeechSynthesisUtterance(' ');
+  sil.volume=0.01;sil.lang='fr-FR';
+  window.speechSynthesis.speak(sil);
 
   showToast('🤖 Génération...');
-  var cutoff=new Date();cutoff.setDate(cutoff.getDate()+parseInt(days));
+  var cutoff=new Date();
+  cutoff.setDate(cutoff.getDate()+days);
   var items=allDashItems.filter(function(it){
     if(!it.date)return true;
     return new Date(it.date+'T12:00:00')<=cutoff;
   });
-  var prompt='Tu es une assistante personnelle, voix féminine, directe, efficace et légèrement humoristique.\n'
-    +'Fais un brief ULTRA court et concret de '+days+' jours. RÈGLES STRICTES :\n'
-    +'- Commence par 2-3 mots qui résument la charge (ex: "Semaine tranquille.", "Ça va chauffer.", "Accroche-toi bien.")\n'
-    +'- Liste les tâches/événements de manière directe, une phrase par item max\n'
-    +'- Zéro introduction, zéro conseil, zéro "Bonjour"\n'
-    +'- Humour subtil bienvenu mais reste efficace\n'
-    +'- 5-7 phrases max au total\n'
-    +'Éléments : '+items.map(function(it){
-      return'"'+it.titre.replace(/\[.*?\]\s*/g,'')+'"'+(it.date?' le '+new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):'')+(it.heure?' à '+it.heure:'');
-    }).join(', ')+'.';
+
+  var txt=items.map(function(it){
+    return'"'+it.titre.replace(/\[.*?\]\s*/g,'')+'"'
+      +(it.date?' le '+new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):'')
+      +(it.heure?' à '+it.heure:'');
+  }).join(', ');
+
+  var prompt='Tu es une assistante personnelle directe, efficace, légèrement humoristique.\n'
+    +'Brief ULTRA court de '+days+' jours. RÈGLES :\n'
+    +'- Commence par 2-3 mots sur la charge (ex: Semaine tranquille. / Ça va chauffer. / Accroche-toi.)\n'
+    +'- Une phrase max par item, direct et concret\n'
+    +'- Zéro bonjour, zéro conseil, zéro introduction\n'
+    +'- Humour subtil OK\n'
+    +'- 5-7 phrases max\n'
+    +'Éléments : '+txt+'.';
 
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.7,max_tokens:600})
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.7,max_tokens:400})
   })
   .then(function(r){return r.json();})
-  .then(function(d){
-    var brief=d.choices[0].message.content;
-    window.speechSynthesis.cancel();
-    u.lang='fr-FR';u.rate=1.05;u.pitch=1.1;u.volume=1;
-    window.speechSynthesis.speak(u);
-    u.lang='fr-FR';u.rate=1.0;u.pitch=1.0;u.volume=1;
-    window.speechSynthesis.speak(u);
-  })
+  .then(function(d){speak(d.choices[0].message.content);})
   .catch(function(e){showToast('❌ '+e.message);});
+}
+
+function speak(txt){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  var spk=new SpeechSynthesisUtterance(txt);
+  var voices=window.speechSynthesis.getVoices();
+  var voice=voices.find(function(v){return v.lang==='fr-FR'&&v.name.includes('Marie');})
+    ||voices.find(function(v){return v.lang==='fr-FR'&&(v.name.includes('Amélie')||v.name.includes('Alice'));})
+    ||voices.find(function(v){return v.lang==='fr-FR';});
+  if(voice)spk.voice=voice;
+  spk.lang='fr-FR';spk.rate=1.05;spk.pitch=1.1;spk.volume=1;
+  window.speechSynthesis.speak(spk);
 }
 
 var recognition=null,isRecording=false;
@@ -488,7 +509,8 @@ function toggleRecording(){isRecording?stopRecording():startRecording();}
 function startRecording(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){showToast('❌ Micro non supporté');return;}
-  recognition=new SR();recognition.lang='fr-FR';recognition.continuous=false;recognition.interimResults=true;
+  recognition=new SR();
+  recognition.lang='fr-FR';recognition.continuous=false;recognition.interimResults=true;
   var final='';
   recognition.onstart=function(){
     isRecording=true;final='';
@@ -533,20 +555,22 @@ function analyzeWithGroq(transcript){
   var today=new Date();
   var todayISO=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
 
-  function nextDay(t){
+  function nextDay(target){
     var d=new Date(today.getFullYear(),today.getMonth(),today.getDate());
-    var diff=t-d.getDay();if(diff<=0)diff+=7;d.setDate(d.getDate()+diff);
+    var diff=target-d.getDay();if(diff<=0)diff+=7;d.setDate(d.getDate()+diff);
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   }
   var tom=new Date(today.getFullYear(),today.getMonth(),today.getDate()+1);
   var tomISO=tom.getFullYear()+'-'+String(tom.getMonth()+1).padStart(2,'0')+'-'+String(tom.getDate()).padStart(2,'0');
   var daysMap={lundi:nextDay(1),mardi:nextDay(2),mercredi:nextDay(3),jeudi:nextDay(4),vendredi:nextDay(5),samedi:nextDay(6),dimanche:nextDay(0),demain:tomISO};
 
-  var prompt='Tu es un assistant personnel. Aujourd\'hui : '+today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+' ('+todayISO+')\n'
-    +'Dates EXACTES : '+Object.entries(daysMap).map(function(e){return'"'+e[0]+'":'+e[1];}).join(', ')+'\n'
-    +'Message : "'+transcript+'"\n'
-    +'Utilise EXACTEMENT ces dates. Catégorie : urgences|travail|projets|personnel. Sans jour → '+todayISO+'\n'
-    +'JSON uniquement : {"reponse":"2-3 phrases","taches":[{"titre":"","date":"YYYY-MM-DD","heure":"HH:MM ou vide","type":"urgent|normal|rappel","categorie":"urgences|travail|projets|personnel"}]}';
+  var prompt='Tu es un assistant personnel. Aujourd\'hui : '
+    +today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+    +' ('+todayISO+')\nDates EXACTES : '
+    +Object.entries(daysMap).map(function(e){return'"'+e[0]+'":'+e[1];}).join(', ')
+    +'\nMessage : "'+transcript+'"'
+    +'\nUtilise EXACTEMENT ces dates. Catégorie : urgences|travail|projets|personnel. Sans jour → '+todayISO
+    +'\nJSON uniquement : {"reponse":"2-3 phrases","taches":[{"titre":"","date":"YYYY-MM-DD","heure":"HH:MM ou vide","type":"urgent|normal|rappel","categorie":"urgences|travail|projets|personnel"}]}';
 
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
@@ -559,23 +583,24 @@ function analyzeWithGroq(transcript){
     var parsed=JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
     document.getElementById('responseText').textContent=parsed.reponse;
     document.getElementById('responseBox').classList.add('visible');
-
     var todayList=document.getElementById('todayTasks');
     if(parsed.taches&&parsed.taches.length){
       if(!todayList.querySelector('.sec'))todayList.innerHTML='<div class="sec">Tâches ajoutées</div>';
-      parsed.taches.forEach(function(t){
-        var cat=t.categorie||'travail';
+      parsed.taches.forEach(function(tache){
+        var cat=tache.categorie||'travail';
         var card=document.createElement('div');card.className='card';
-        card.innerHTML='<div class="row-flex"><div class="dot d-'+cat+'" style="margin-top:5px"></div>'
-          +'<div style="flex:1"><div class="card-title">'+t.titre+'</div>'
-          +'<div class="card-meta"><span class="badge b-'+cat+'">'+cat+'</span>'+(t.date?' · '+new Date(t.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}):' ')+(t.heure?' · '+t.heure:'')+'</div></div>'
+        card.innerHTML='<div class="rflex"><div class="dot d-'+cat+'" style="margin-top:5px"></div>'
+          +'<div style="flex:1"><div class="card-title">'+tache.titre+'</div>'
+          +'<div class="card-meta"><span class="badge b-'+cat+'">'+cat+'</span>'
+          +(tache.date?' · '+new Date(tache.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}):'')
+          +(tache.heure?' · '+tache.heure:'')+'</div></div>'
           +'<div class="check" onclick="this.classList.toggle(\'done\');this.textContent=this.classList.contains(\'done\')?\'✓\':\'\'"></div></div>';
         todayList.appendChild(card);
       });
       if(gToken){
-        parsed.taches.forEach(function(t){
-          createCalendarEvent(t.titre,t.date||todayISO,t.heure,t.categorie||'travail');
-          createGoogleTask(t.titre,t.date||todayISO,t.categorie||'travail');
+        parsed.taches.forEach(function(tache){
+          createCalendarEvent(tache.titre,tache.date||todayISO,tache.heure,tache.categorie||'travail');
+          createGoogleTask(tache.titre,tache.date||todayISO,tache.categorie||'travail');
         });
         showToast('✅ Sync Google !');
       }
@@ -584,19 +609,6 @@ function analyzeWithGroq(transcript){
     resetMic();
   })
   .catch(function(err){showToast('❌ '+err.message);resetMic();});
-}
-
-function speak(txt){
-  if(!window.speechSynthesis)return;
-  window.speechSynthesis.cancel();
-  var voices=window.speechSynthesis.getVoices();
-  var spk=new SpeechSynthesisUtterance(txt);
-  var frVoice=voices.find(function(v){return v.lang==='fr-FR'&&v.name.includes('Marie');})
-    ||voices.find(function(v){return v.lang==='fr-FR'&&(v.name.includes('Amélie')||v.name.includes('Alice'));})
-    ||voices.find(function(v){return v.lang==='fr-FR';});
-  if(frVoice)spk.voice=frVoice;
-  spk.lang='fr-FR';spk.rate=1.05;spk.pitch=1.1;spk.volume=1;
-  window.speechSynthesis.speak(spk);
 }
 </script>
 </body>
