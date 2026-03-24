@@ -126,6 +126,9 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
     <div style="flex:1"><div style="font-weight:500;font-size:13px">🎯 Mode Focus — Urgences uniquement</div></div>
     <div class="toggle" id="focusToggle"></div>
   </div>
+  <div class="sec">Vue semaine</div>
+  <div class="week-grid" id="weekGrid"></div>
+  <div class="week-detail" id="weekDetail"></div>
   <div class="sec">Charge des prochains jours</div>
   <div class="score-bar" id="scoreBar"></div>
   <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
@@ -392,7 +395,66 @@ function moveToCat(newCat){
   showToast('✅ Déplacé vers '+newCat);
 }
 
-function computeScores(events){
+function renderWeekGrid(){
+  var grid=document.getElementById('weekGrid');
+  var today=new Date();
+  var todayISO=today.toISOString().split('T')[0];
+  var catColors={urgences:'#ff4757',travail:'#4a90d9',projets:'#B5CAC1',personnel:'#2ed573'};
+  var jours=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  var html='';
+  for(var i=0;i<7;i++){
+    var d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+i);
+    var dISO=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    var dayItems=allDashItems.filter(function(it){
+      if(!it.date)return false;
+      var itDate=it.date.split('T')[0];
+      return itDate===dISO;
+    });
+    var isToday=dISO===todayISO;
+    var dots=dayItems.slice(0,4).map(function(it){
+      var col=catColors[it.cat]||'#B5CAC1';
+      return'<div class="week-dot" style="background:'+col+'"></div>';
+    }).join('');
+    html+='<div class="week-day'+(isToday?' today':'')+'" onclick="showWeekDay(\''+dISO+'\')">'
+      +'<div class="week-day-name">'+jours[d.getDay()]+'</div>'
+      +'<div class="week-day-num" style="color:'+(isToday?'#fff':'#B5CAC1')+'">'+d.getDate()+'</div>'
+      +dots
+      +'</div>';
+  }
+  grid.innerHTML=html;
+}
+
+function showWeekDay(dateISO){
+  var detail=document.getElementById('weekDetail');
+  var items=allDashItems.filter(function(it){
+    if(!it.date)return false;
+    return it.date.split('T')[0]===dateISO;
+  });
+  var d=new Date(dateISO+'T12:00:00');
+  var label=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  if(!items.length){
+    detail.innerHTML='<div class="week-detail-title">'+label+'</div><div style="color:#B5CAC1;font-size:13px">Rien de prévu 🎉</div>';
+    detail.classList.add('visible');
+    return;
+  }
+  var catColors={urgences:'#ff4757',travail:'#4a90d9',projets:'#B5CAC1',personnel:'#2ed573'};
+  var html='<div class="week-detail-title">'+label+'</div>';
+  items.forEach(function(it){
+    var col=catColors[it.cat]||'#B5CAC1';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'
+      +'<div style="width:7px;height:7px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
+      +'<div style="flex:1;font-size:13px">'+it.titre.replace(/\[.*?\]\s*/g,'')+'</div>'
+      +(it.heure?'<div style="font-size:11px;color:#B5CAC1">'+it.heure+'</div>':'')
+      +'</div>';
+  });
+  detail.innerHTML=html;
+  detail.classList.add('visible');
+  // Highlight la colonne sélectionnée
+  document.querySelectorAll('.week-day').forEach(function(el){el.classList.remove('selected');});
+  var idx=Math.round((new Date(dateISO+'T12:00:00')-new Date(new Date().toISOString().split('T')[0]+'T12:00:00'))/(1000*3600*24));
+  var days=document.querySelectorAll('.week-day');
+  if(days[idx])days[idx].classList.add('selected');
+}
   var scores={};
   var today=new Date();
   for(var i=0;i<3;i++){
@@ -453,6 +515,7 @@ function loadDashboard(){
             });
           }catch(ex){}
           renderDashboard();
+          renderWeekGrid();
         });
       });
     });
