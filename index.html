@@ -71,7 +71,15 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 .toast.show{opacity:1}
 .row-flex{display:flex;align-items:flex-start;gap:10px}
 .empty{color:#B5CAC1;text-align:center;padding:24px;font-size:14px;line-height:1.7}
-.cat-select{background:#054f64;border:1px solid rgba(181,202,193,0.3);border-radius:6px;padding:3px 6px;font-size:11px;color:#B5CAC1;outline:none;-webkit-appearance:none;width:auto}
+/* Modal catégorie */
+.cat-modal{position:fixed;bottom:0;left:0;right:0;background:#043d4f;border-top:1px solid rgba(181,202,193,0.3);border-radius:20px 20px 0 0;padding:20px;z-index:1000;transform:translateY(100%);transition:transform 0.3s ease}
+.cat-modal.open{transform:translateY(0)}
+.cat-modal h3{font-size:14px;color:#B5CAC1;margin-bottom:14px;text-align:center}
+.cat-modal-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cat-opt{background:#076880;border:1px solid rgba(181,202,193,0.3);border-radius:10px;padding:12px;text-align:center;font-size:14px;cursor:pointer}
+.cat-opt.active{border-color:#B5CAC1;background:#054f64}
+.cat-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none}
+.cat-modal-overlay.open{display:block}
 </style>
 </head>
 <body>
@@ -142,6 +150,17 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
     <select id="addCat"><option value="travail">💼 Travail</option><option value="personnel">👤 Personnel</option><option value="projets">🚀 Projets</option><option value="urgences">🚨 Urgences</option></select>
     <div class="row"><input type="date" id="addDate" style="flex:1"/><input type="time" id="addTime" style="flex:1"/></div>
     <div class="actions"><button class="btn-ash" onclick="addToCalendar()">📅 Calendar</button><button class="btn-ash" onclick="addToTasks()">✅ Tasks</button></div>
+  </div>
+</div>
+
+<div class="cat-modal-overlay" id="catOverlay" onclick="closeCatModal()"></div>
+<div class="cat-modal" id="catModal">
+  <h3>Déplacer vers...</h3>
+  <div class="cat-modal-opts">
+    <div class="cat-opt" onclick="moveToCat('urgences')">🚨 Urgences</div>
+    <div class="cat-opt" onclick="moveToCat('travail')">💼 Travail</div>
+    <div class="cat-opt" onclick="moveToCat('projets')">🚀 Projets</div>
+    <div class="cat-opt" onclick="moveToCat('personnel')">👤 Personnel</div>
   </div>
 </div>
 
@@ -294,6 +313,29 @@ function isHidden(id,dateStr){
   return true;
 }
 
+var selectedItemId=null;
+
+function openCatModal(id){
+  selectedItemId=id;
+  document.getElementById('catModal').classList.add('open');
+  document.getElementById('catOverlay').classList.add('open');
+}
+
+function closeCatModal(){
+  document.getElementById('catModal').classList.remove('open');
+  document.getElementById('catOverlay').classList.remove('open');
+  selectedItemId=null;
+}
+
+function moveToCat(newCat){
+  if(!selectedItemId)return;
+  var item=allDashItems.find(function(it){return it.id===selectedItemId;});
+  if(item){item.cat=newCat;}
+  closeCatModal();
+  renderDashboard();
+  showToast('✅ Déplacé vers '+newCat);
+}
+
 function changeCat(id,newCat){
   var item=allDashItems.find(function(it){return it.id===id;});
   if(item){item.cat=newCat;renderDashboard();}
@@ -381,35 +423,40 @@ function renderDashboard(){
     html+='<div class="sec">'+catLabels[cat]+'</div>';
     items.forEach(function(it){
       var dateStr=it.date?new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}):'';
-      var opts=cats.filter(function(c){return c!==cat;}).map(function(c){return'<option value="'+c+'">→ '+catOpts[c]+'</option>';}).join('');
       html+='<div class="card"><div style="display:flex;align-items:flex-start;gap:8px">'
-        +'<div style="flex:1"><div class="card-title">'+it.titre.replace(/\[.*?\]\s*/g,'')+'</div>'
-        +'<div class="card-meta">'+(it.type==='event'?'📅':'✅')+' '+dateStr+(it.heure?' · '+it.heure:'')+'</div></div>'
-        +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">'
+        +'<div style="flex:1" onclick="openCatModal(\''+it.id+'\')" style="cursor:pointer"><div class="card-title">'+it.titre.replace(/\[.*?\]\s*/g,'')+'</div>'
+        +'<div class="card-meta">'+(it.type==='event'?'📅':'✅')+' '+dateStr+(it.heure?' · '+it.heure:'')+'</div>'
+        +'<div style="font-size:11px;color:#B5CAC1;margin-top:4px">Appuie pour déplacer ↕</div></div>'
         +'<button class="card-hide" onclick="hideEvent(\''+it.id+'\',\''+it.date+'\')">✕</button>'
-        +'<select class="cat-select" onchange="changeCat(\''+it.id+'\',this.value);this.selectedIndex=0">'
-        +'<option value="">↕</option>'+opts+'</select>'
-        +'</div></div></div>';
+        +'</div></div>';
     });
   });
   if(!html)html='<div class="empty">'+(focusMode?'Aucune urgence 🎉':'Aucun élément à venir 🎉')+'</div>';
   dash.innerHTML=html;
 }
 
+// Brief vocal — pré-déverrouille l'audio au tap, puis parle
 function playBrief(){
   if(!gToken){showToast('⚠️ Connecte Google');return;}
   if(!allDashItems.length){showToast('⚠️ Charge le dashboard d\'abord');return;}
   var days=document.getElementById('briefDays').value;
-  showToast('🤖 Génération du brief...');
+
+  // Déverrouille audio iOS immédiatement dans le même tick
+  window.speechSynthesis.cancel();
+  var silence=new SpeechSynthesisUtterance(' ');
+  silence.volume=0.01;silence.lang='fr-FR';
+  window.speechSynthesis.speak(silence);
+
+  showToast('🤖 Génération...');
   var cutoff=new Date();cutoff.setDate(cutoff.getDate()+parseInt(days));
   var items=allDashItems.filter(function(it){
     if(!it.date)return true;
     return new Date(it.date+'T12:00:00')<=cutoff;
   });
-  var prompt='Tu es une secrétaire professionnelle et bienveillante. Fais un brief vocal naturel de '+days+' jours.\n'
+  var prompt='Tu es une secrétaire professionnelle. Brief vocal naturel de '+days+' jours.\n'
     +'Éléments : '+items.map(function(it){
-      return it.cat+': "'+it.titre.replace(/\[.*?\]\s*/g,'')+'"'+(it.date?' le '+new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):'')+(it.heure?' à '+it.heure:'');
-    }).join(', ')+'.\nCommence par "Bonjour," résumé 5-8 phrases. Priorise urgences. Termine par un conseil.';
+      return it.cat+':"'+it.titre.replace(/\[.*?\]\s*/g,'')+'"'+(it.date?' le '+new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):'')+(it.heure?' à '+it.heure:'');
+    }).join(', ')+'.\nCommence par "Bonjour,". 5-8 phrases. Priorise urgences. Conseil final.';
 
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
@@ -420,14 +467,9 @@ function playBrief(){
   .then(function(d){
     var brief=d.choices[0].message.content;
     window.speechSynthesis.cancel();
-    var unlock=new SpeechSynthesisUtterance('');
-    unlock.volume=0;
-    unlock.onend=function(){
-      var u=new SpeechSynthesisUtterance(brief);
-      u.lang='fr-FR';u.rate=1.0;
-      window.speechSynthesis.speak(u);
-    };
-    window.speechSynthesis.speak(unlock);
+    var u=new SpeechSynthesisUtterance(brief);
+    u.lang='fr-FR';u.rate=1.0;u.pitch=1.0;u.volume=1;
+    window.speechSynthesis.speak(u);
   })
   .catch(function(e){showToast('❌ '+e.message);});
 }
