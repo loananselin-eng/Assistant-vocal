@@ -166,13 +166,13 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
   <div class="score-bar" id="scoreBar"></div>
 
   <!-- Résumé vocal secrétaire -->
-  <div class="brief-bar">
-    <select id="briefDays">
+  <div style="display:flex;gap:8px;margin-bottom:14px;align-items:stretch">
+    <select id="briefDays" style="flex:1;background:#043d4f;border:1px solid rgba(181,202,193,0.3);border-radius:10px;padding:10px 12px;font-size:13px;outline:none;color:#fff;-webkit-appearance:none">
       <option value="3">📅 3 prochains jours</option>
       <option value="7">📅 7 prochains jours</option>
     </select>
-    <button class="btn-small" onclick="playBrief()">🔊 Brief vocal</button>
-    <button class="btn-small" onclick="loadDashboard()">🔄</button>
+    <button onclick="playBrief()" style="background:#B5CAC1;border:none;border-radius:10px;padding:10px 14px;font-size:13px;cursor:pointer;color:#054f64;font-weight:600;white-space:nowrap">🔊 Brief</button>
+    <button onclick="loadDashboard()" style="background:#076880;border:1px solid rgba(181,202,193,0.4);border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer">🔄</button>
   </div>
 
   <div id="dashboard"><div class="empty">Connecte Google pour voir ton dashboard</div></div>
@@ -444,7 +444,11 @@ Tableaux = indices 0-based.
 }
 window.loadDashboard=loadDashboard;
 
-function renderDashboard(){
+function changeCat(id,newCat){
+  const item=allDashItems.find(it=>it.id===id);
+  if(item){item.cat=newCat;renderDashboard();}
+}
+window.changeCat=changeCat;
   const dash=document.getElementById('dashboard');
   if(!allDashItems.length){dash.innerHTML='<div class="empty">Aucun élément à venir 🎉</div>';return;}
 
@@ -461,10 +465,24 @@ function renderDashboard(){
     html+=`<div class="sec">${catLabels[cat]}</div>`;
     items.forEach(it=>{
       const dateStr=it.date?new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}):'';
+      const catOptions=['urgences','travail','projets','personnel']
+        .filter(c=>c!==cat)
+        .map(c=>`<option value="${c}">${{urgences:'🚨 Urgences',travail:'💼 Travail',projets:'🚀 Projets',personnel:'👤 Personnel'}[c]}</option>`)
+        .join('');
       html+=`<div class="card">
-        <button class="card-hide" onclick="hideEvent('${it.id}','${it.date}')">✕</button>
-        <div class="card-title">${it.titre.replace(/\[.*?\]\s*/,'')}</div>
-        <div class="card-meta">${it.type==='event'?'📅':'✅'} ${dateStr}${it.heure?' · '+it.heure:''}</div>
+        <div style="display:flex;align-items:flex-start;gap:8px">
+          <div style="flex:1">
+            <div class="card-title">${it.titre.replace(/\[.*?\]\s*/,'')}</div>
+            <div class="card-meta">${it.type==='event'?'📅':'✅'} ${dateStr}${it.heure?' · '+it.heure:''}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+            <button class="card-hide" onclick="hideEvent('${it.id}','${it.date}')">✕</button>
+            <select onchange="changeCat('${it.id}',this.value)" style="background:#054f64;border:1px solid rgba(181,202,193,0.3);border-radius:6px;padding:3px 6px;font-size:11px;color:#B5CAC1;outline:none;-webkit-appearance:none">
+              <option value="${cat}">↕ Déplacer</option>
+              ${catOptions}
+            </select>
+          </div>
+        </div>
       </div>`;
     });
   });
@@ -486,9 +504,9 @@ async function playBrief(){
     return new Date(it.date+'T12:00:00')<=cutoff;
   });
 
-  const prompt=`Tu es une secrétaire professionnelle et bienveillante. Fais un brief vocal naturel et fluide de ${days} jours pour ton patron.
-Voici ses éléments : ${items.map(it=>`${it.cat}: "${it.titre.replace(/\[.*?\]\s*/,'')}"${it.date?' le '+new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):''}${it.heure?' à '+it.heure:''}`).join(', ')}.
-Commence par "Bonjour," et fais un résumé parlé naturel en 5-8 phrases. Priorise les urgences. Termine par un conseil de journée.`;
+  const prompt=`Tu es une secrétaire professionnelle et bienveillante. Fais un brief vocal naturel de ${days} jours.
+Éléments : ${items.map(it=>`${it.cat}: "${it.titre.replace(/\[.*?\]\s*/,'')}"${it.date?' le '+new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):''}${it.heure?' à '+it.heure:''}`).join(', ')}.
+Commence par "Bonjour," résumé parlé naturel 5-8 phrases. Priorise les urgences. Termine par un conseil.`;
 
   try{
     const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
@@ -498,7 +516,19 @@ Commence par "Bonjour," et fais un résumé parlé naturel en 5-8 phrases. Prior
     });
     const d=await r.json();
     const brief=d.choices[0].message.content;
-    speak(brief);
+
+    // iOS nécessite que speak() soit appelé dans le même tick qu'un événement utilisateur
+    // On utilise une utterance vide pour débloquer puis on chaîne
+    window.speechSynthesis.cancel();
+    const unlock=new SpeechSynthesisUtterance('');
+    unlock.volume=0;
+    unlock.onend=()=>{
+      const u=new SpeechSynthesisUtterance(brief);
+      u.lang='fr-FR';u.rate=1.0;u.pitch=1.0;
+      window.speechSynthesis.speak(u);
+    };
+    window.speechSynthesis.speak(unlock);
+
   }catch(e){showToast('❌ '+e.message);}
 }
 window.playBrief=playBrief;
