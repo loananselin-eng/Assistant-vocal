@@ -10,46 +10,66 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <title>Mon Assistant</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; color:#ffffff; }
-input { color:#ffffff !important; }
-.api-bar input::placeholder { color:rgba(255,255,255,0.5) !important; }
-body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#054f64; min-height:100vh; display:flex; flex-direction:column; }
-header { padding:50px 24px 20px; text-align:center; }
-.date { font-size:13px; color:#B5CAC1; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px; }
-h1 { font-size:22px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; }
-.api-bar { margin:0 20px 10px; display:flex; gap:8px; align-items:center; }
-.api-bar input { flex:1; background:#076880; border:1px solid #B5CAC1; border-radius:10px; padding:10px 14px; font-size:13px; outline:none; }
-.api-bar button { background:#B5CAC1; border:none; border-radius:10px; padding:10px 14px; color:#054f64; font-size:13px; cursor:pointer; font-weight:600; }
-.ms-btn { width:calc(100% - 40px); margin:0 20px 16px; background:#054f64 !important; border:1px solid #B5CAC1 !important; border-radius:10px; padding:12px; color:#fff !important; font-size:13px; cursor:pointer; text-align:center; display:block; }
-.mic-area { display:flex; flex-direction:column; align-items:center; padding:24px; gap:14px; }
-.mic-btn { width:90px; height:90px; border-radius:50%; border:none; background:linear-gradient(135deg,#076880,#B5CAC1); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:36px; box-shadow:0 0 30px rgba(181,202,193,0.3); transition:all 0.2s; }
-.mic-btn.recording { background:linear-gradient(135deg,#ff4757,#ff6b81); box-shadow:0 0 40px rgba(255,71,87,0.6); animation:pulse 1.2s infinite; }
-.mic-btn.loading { animation:spin-glow 1.5s infinite; }
-@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
-@keyframes spin-glow { 0%,100%{box-shadow:0 0 30px rgba(181,202,193,0.3)} 50%{box-shadow:0 0 60px rgba(181,202,193,0.7)} }
-.mic-label { font-size:14px; }
-.transcript-box { margin:0 20px; background:#076880; border:1px solid #B5CAC1; border-radius:16px; padding:16px; min-height:60px; font-size:15px; line-height:1.5; display:none; }
-.transcript-box.visible { display:block; }
-.transcript-box .label { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:#B5CAC1; margin-bottom:8px; }
-.response-box { margin:14px 20px; background:#043d4f; border:1px solid #B5CAC1; border-radius:16px; padding:16px; display:none; }
-.response-box.visible { display:block; }
-.response-box .label { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:#B5CAC1; margin-bottom:10px; }
-.response-box p { font-size:15px; line-height:1.6; }
-.section { margin:0 20px 20px; }
-.section h2 { font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:#B5CAC1; margin-bottom:12px; }
-.card { background:#076880; border:1px solid #B5CAC1; border-radius:12px; padding:14px 16px; margin-bottom:10px; }
-.card-title { font-size:15px; font-weight:500; margin-bottom:4px; }
-.card-meta { font-size:12px; color:#B5CAC1; }
-.task-card { display:flex; align-items:flex-start; gap:12px; animation:slideIn 0.3s ease; }
-@keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-.task-dot { width:10px; height:10px; border-radius:50%; margin-top:4px; flex-shrink:0; }
-.dot-urgent{background:#ff4757} .dot-normal{background:#B5CAC1} .dot-reminder{background:#ffffff}
-.task-check { width:22px; height:22px; border-radius:50%; border:2px solid #B5CAC1; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all 0.2s; margin-left:auto; }
-.task-check.done { background:#B5CAC1; color:#054f64; }
-.empty { text-align:center; padding:30px 20px; font-size:14px; color:#B5CAC1; line-height:1.8; }
-.status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#B5CAC1; margin-right:6px; }
-.toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#076880; border:1px solid #B5CAC1; border-radius:20px; padding:10px 20px; font-size:13px; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; z-index:999; }
-.toast.show { opacity:1; }
+*{margin:0;padding:0;box-sizing:border-box;color:#fff}
+input,textarea{color:#fff!important}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.4)!important}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#054f64;min-height:100vh;padding-bottom:40px}
+header{padding:50px 20px 16px;text-align:center}
+.date{font-size:12px;color:#B5CAC1;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px}
+h1{font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px}
+/* Nav tabs */
+.tabs{display:flex;margin:16px 20px;background:#043d4f;border-radius:12px;padding:4px;gap:4px}
+.tab{flex:1;padding:10px 6px;text-align:center;font-size:13px;border-radius:9px;cursor:pointer;transition:all 0.2s;color:#B5CAC1}
+.tab.active{background:#076880;color:#fff;font-weight:500}
+/* Pages */
+.page{display:none;padding:0 20px}
+.page.active{display:block}
+/* Boutons */
+.btn-primary{width:100%;background:#076880;border:1px solid #B5CAC1;border-radius:12px;padding:13px;font-size:14px;cursor:pointer;text-align:center;margin-bottom:10px}
+.btn-google{background:#054f64!important}
+.btn-save{background:#B5CAC1;color:#054f64!important;border:none;border-radius:10px;padding:10px 16px;font-size:13px;cursor:pointer;font-weight:600}
+/* Micro */
+.mic-area{display:flex;flex-direction:column;align-items:center;padding:28px 0;gap:14px}
+.mic-btn{width:86px;height:86px;border-radius:50%;border:none;background:linear-gradient(135deg,#076880,#B5CAC1);cursor:pointer;font-size:34px;box-shadow:0 0 28px rgba(181,202,193,0.3);transition:all 0.2s;display:flex;align-items:center;justify-content:center}
+.mic-btn.recording{background:linear-gradient(135deg,#ff4757,#ff6b81);animation:pulse 1.2s infinite}
+.mic-btn.loading{animation:glow 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes glow{0%,100%{box-shadow:0 0 28px rgba(181,202,193,0.3)}50%{box-shadow:0 0 55px rgba(181,202,193,0.7)}}
+.mic-label{font-size:14px;color:#B5CAC1}
+/* Cards */
+.card{background:#076880;border:1px solid rgba(181,202,193,0.4);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.card-title{font-size:15px;font-weight:500;margin-bottom:3px}
+.card-meta{font-size:12px;color:#B5CAC1}
+/* Section headers */
+.sec-title{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#B5CAC1;margin:18px 0 8px;display:flex;align-items:center;justify-content:space-between}
+.sec-title span{cursor:pointer;font-size:16px}
+/* Catégories */
+.cat-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;margin-right:6px}
+.cat-urgences{background:rgba(255,71,87,0.25);color:#ff8f9a}
+.cat-travail{background:rgba(74,144,217,0.25);color:#7ab8f5}
+.cat-projets{background:rgba(181,202,193,0.2);color:#B5CAC1}
+.cat-personnel{background:rgba(46,213,115,0.2);color:#7eeaaa}
+/* Formulaire ajout */
+.add-form{background:#043d4f;border:1px solid rgba(181,202,193,0.3);border-radius:16px;padding:16px;margin-bottom:16px}
+.add-form input,.add-form select{width:100%;background:#076880;border:1px solid rgba(181,202,193,0.4);border-radius:10px;padding:10px 14px;font-size:14px;outline:none;margin-bottom:10px}
+.add-form select option{background:#054f64}
+.add-form .row{display:flex;gap:8px}
+.add-form .row input{margin-bottom:0}
+/* Transcript / réponse */
+.info-box{background:#043d4f;border:1px solid rgba(181,202,193,0.3);border-radius:14px;padding:14px;margin-bottom:12px;display:none}
+.info-box.visible{display:block}
+.info-box .lbl{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#B5CAC1;margin-bottom:6px}
+/* Task check */
+.task-row{display:flex;align-items:center;gap:12px}
+.task-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot-urgences{background:#ff4757}.dot-travail{background:#4a90d9}.dot-projets{background:#B5CAC1}.dot-personnel{background:#2ed573}
+.check{width:22px;height:22px;border-radius:50%;border:2px solid #B5CAC1;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;margin-left:auto;transition:all 0.2s}
+.check.done{background:#B5CAC1;color:#054f64}
+/* Toast */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#076880;border:1px solid #B5CAC1;border-radius:20px;padding:10px 20px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;z-index:999}
+.toast.show{opacity:1}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.slide{animation:slideIn 0.3s ease}
 </style>
 </head>
 <body>
@@ -57,370 +77,459 @@ h1 { font-size:22px; font-weight:600; display:flex; align-items:center; justify-
 <header>
   <div class="date" id="dateDisplay"></div>
   <h1>
-    <svg width="32" height="32" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <svg width="30" height="30" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
       <rect width="200" height="200" fill="#054f64" rx="48"/>
       <line x1="100" y1="8" x2="100" y2="192" stroke="#fff" stroke-width="0.7" stroke-dasharray="2 8" opacity="0.2" stroke-linecap="round"/>
       <line x1="8" y1="100" x2="192" y2="100" stroke="#fff" stroke-width="0.7" stroke-dasharray="2 8" opacity="0.2" stroke-linecap="round"/>
       <path d="M18 100 Q100 18 182 100" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
-      <path d="M20 110 Q100 28 180 110" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
       <path d="M18 100 Q100 182 182 100" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
-      <path d="M20 90 Q100 172 180 90" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
       <rect x="0" y="0" width="22" height="200" fill="#054f64"/>
       <rect x="178" y="0" width="22" height="200" fill="#054f64"/>
       <circle cx="100" cy="100" r="28" fill="#076880"/>
-      <ellipse cx="107" cy="100" rx="22" ry="28" fill="#054f64" opacity="0.22"/>
       <circle cx="100" cy="100" r="28" fill="none" stroke="#B5CAC1" stroke-width="1.8"/>
       <ellipse cx="100" cy="100" rx="48" ry="12" fill="none" stroke="#B5CAC1" stroke-width="2" transform="rotate(-15 100 100)"/>
       <circle cx="100" cy="100" r="28" fill="#076880"/>
       <circle cx="100" cy="100" r="28" fill="none" stroke="#B5CAC1" stroke-width="1.8"/>
     </svg>
-    Bonjour !
+    Mon Assistant
   </h1>
 </header>
 
-<button class="ms-btn" id="msBtn" onclick="signInGoogle()">🔗 Connecter Google Calendar & Tasks</button>
-
-<div class="api-bar">
-  <input type="password" id="apiKey" placeholder="Clé Groq (gsk_...)"/>
-  <button onclick="saveKey()">💾</button>
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('vocal')">🎙️ Vocal</div>
+  <div class="tab" onclick="switchTab('dashboard')">📊 Dashboard</div>
+  <div class="tab" onclick="switchTab('add')">➕ Ajouter</div>
 </div>
 
-<div class="mic-area">
-  <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎙️</button>
-  <div class="mic-label" id="micLabel">Appuie pour parler</div>
+<!-- PAGE : VOCAL -->
+<div class="page active" id="page-vocal">
+  <button class="btn-primary btn-google" id="msBtn" onclick="signInGoogle()">🔗 Connecter Google Calendar & Tasks</button>
+
+  <div class="mic-area">
+    <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎙️</button>
+    <div class="mic-label" id="micLabel">Appuie pour parler</div>
+  </div>
+
+  <div class="info-box" id="transcriptBox">
+    <div class="lbl">Tu as dit</div>
+    <div id="transcriptText"></div>
+  </div>
+
+  <div class="info-box" id="responseBox">
+    <div class="lbl">🤖 Ton assistant</div>
+    <p id="responseText"></p>
+  </div>
+
+  <div id="todayTasks"></div>
 </div>
 
-<div class="transcript-box" id="transcriptBox">
-  <div class="label">Tu as dit</div>
-  <div id="transcriptText"></div>
+<!-- PAGE : DASHBOARD -->
+<div class="page" id="page-dashboard">
+  <div class="sec-title">Agenda & tâches à venir <span onclick="loadDashboard()">🔄</span></div>
+  <div id="dashboard"><div style="color:#B5CAC1;text-align:center;padding:30px">Connecte Google pour voir ton récap</div></div>
 </div>
 
-<div class="response-box" id="responseBox">
-  <div class="label"><span class="status-dot"></span>Ton assistant</div>
-  <p id="responseText"></p>
-</div>
-
-<div class="section" id="dashSection" style="display:none">
-  <h2>📊 Récap agenda & tâches</h2>
-  <div id="dashboard"><div class="empty">Chargement...</div></div>
-</div>
-
-<div class="section">
-  <h2>Tâches du jour</h2>
-  <div id="tasksList">
-    <div class="empty">🎙️<br>Parle à ton assistant ce matin<br>pour voir tes tâches apparaître ici</div>
+<!-- PAGE : AJOUTER -->
+<div class="page" id="page-add">
+  <div class="sec-title">Nouvel événement / tâche</div>
+  <div class="add-form">
+    <input type="text" id="addTitle" placeholder="Titre..."/>
+    <select id="addCat">
+      <option value="travail">💼 Travail</option>
+      <option value="personnel">👤 Personnel</option>
+      <option value="projets">🚀 Projets</option>
+      <option value="urgences">🚨 Urgences</option>
+    </select>
+    <div class="row">
+      <input type="date" id="addDate"/>
+      <input type="time" id="addTime" placeholder="Heure (optionnel)"/>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <button class="btn-save" style="flex:1" onclick="addToCalendar()">📅 Calendar</button>
+      <button class="btn-save" style="flex:1" onclick="addToTasks()">✅ Tasks</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-(function() {
+(function(){
 
-  // ── Icône PWA canvas ───────────────────────────────────────
-  const cv = document.createElement('canvas');
-  cv.width = 512; cv.height = 512;
-  const cx = cv.getContext('2d');
-  cx.fillStyle='#054f64';
-  cx.beginPath(); cx.moveTo(123,0); cx.lineTo(389,0);
-  cx.quadraticCurveTo(512,0,512,123); cx.lineTo(512,389);
-  cx.quadraticCurveTo(512,512,389,512); cx.lineTo(123,512);
-  cx.quadraticCurveTo(0,512,0,389); cx.lineTo(0,123);
-  cx.quadraticCurveTo(0,0,123,0); cx.closePath(); cx.fill();
-  cx.strokeStyle='#fff'; cx.lineWidth=1.8; cx.globalAlpha=0.2;
-  cx.setLineDash([5,20]); cx.lineCap='round';
-  cx.beginPath(); cx.moveTo(256,20); cx.lineTo(256,492); cx.stroke();
-  cx.beginPath(); cx.moveTo(20,256); cx.lineTo(492,256); cx.stroke();
-  cx.setLineDash([]); cx.globalAlpha=1;
-  cx.strokeStyle='#fff'; cx.lineWidth=18; cx.lineCap='round';
-  cx.beginPath(); cx.moveTo(46,256); cx.quadraticCurveTo(256,46,466,256); cx.stroke();
-  cx.lineWidth=5; cx.globalAlpha=0.25;
-  cx.beginPath(); cx.moveTo(50,276); cx.quadraticCurveTo(256,66,462,276); cx.stroke();
-  cx.globalAlpha=1; cx.lineWidth=18;
-  cx.beginPath(); cx.moveTo(46,256); cx.quadraticCurveTo(256,466,466,256); cx.stroke();
-  cx.lineWidth=5; cx.globalAlpha=0.25;
-  cx.beginPath(); cx.moveTo(50,236); cx.quadraticCurveTo(256,446,462,236); cx.stroke();
-  cx.globalAlpha=1;
-  cx.fillStyle='#054f64'; cx.fillRect(0,0,56,512); cx.fillRect(456,0,56,512);
-  cx.fillStyle='#076880'; cx.beginPath(); cx.arc(256,256,90,0,Math.PI*2); cx.fill();
-  cx.fillStyle='#054f64'; cx.globalAlpha=0.22;
-  cx.beginPath(); cx.ellipse(278,256,70,90,0,0,Math.PI*2); cx.fill();
-  cx.globalAlpha=1; cx.strokeStyle='#B5CAC1'; cx.lineWidth=3.5;
-  cx.beginPath(); cx.arc(256,256,90,0,Math.PI*2); cx.stroke();
-  cx.save(); cx.translate(256,256); cx.rotate(-15*Math.PI/180);
-  cx.strokeStyle='#B5CAC1'; cx.lineWidth=4;
-  cx.beginPath(); cx.ellipse(0,0,155,40,0,0,Math.PI*2); cx.stroke();
-  cx.restore();
-  cx.fillStyle='#076880'; cx.beginPath(); cx.arc(256,256,90,0,Math.PI*2); cx.fill();
-  cx.strokeStyle='#B5CAC1'; cx.lineWidth=3.5;
-  cx.beginPath(); cx.arc(256,256,90,0,Math.PI*2); cx.stroke();
-  document.getElementById('appIcon').href = cv.toDataURL('image/png');
+// ── Clé Groq intégrée ─────────────────────────────────────
+const GROQ_KEY = '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';
 
-  // ── Manifest PWA ───────────────────────────────────────────
-  const mf = {name:"Mon Assistant",short_name:"Assistant",start_url:"/Assistant-vocal/",display:"standalone",background_color:"#054f64",theme_color:"#054f64"};
-  const ml = document.createElement('link');
-  ml.rel='manifest'; ml.href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/json'}));
-  document.head.appendChild(ml);
+// ── Icône PWA ─────────────────────────────────────────────
+const cv=document.createElement('canvas');
+cv.width=512;cv.height=512;
+const cx=cv.getContext('2d');
+cx.fillStyle='#054f64';
+cx.beginPath();cx.moveTo(123,0);cx.lineTo(389,0);
+cx.quadraticCurveTo(512,0,512,123);cx.lineTo(512,389);
+cx.quadraticCurveTo(512,512,389,512);cx.lineTo(123,512);
+cx.quadraticCurveTo(0,512,0,389);cx.lineTo(0,123);
+cx.quadraticCurveTo(0,0,123,0);cx.closePath();cx.fill();
+cx.strokeStyle='#fff';cx.lineWidth=18;cx.lineCap='round';
+cx.beginPath();cx.moveTo(46,256);cx.quadraticCurveTo(256,46,466,256);cx.stroke();
+cx.beginPath();cx.moveTo(46,256);cx.quadraticCurveTo(256,466,466,256);cx.stroke();
+cx.fillStyle='#054f64';cx.fillRect(0,0,56,512);cx.fillRect(456,0,56,512);
+cx.fillStyle='#076880';cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.fill();
+cx.strokeStyle='#B5CAC1';cx.lineWidth=3.5;cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.stroke();
+cx.save();cx.translate(256,256);cx.rotate(-15*Math.PI/180);
+cx.strokeStyle='#B5CAC1';cx.lineWidth=4;
+cx.beginPath();cx.ellipse(0,0,155,40,0,0,Math.PI*2);cx.stroke();cx.restore();
+cx.fillStyle='#076880';cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.fill();
+cx.strokeStyle='#B5CAC1';cx.lineWidth=3.5;cx.beginPath();cx.arc(256,256,90,0,Math.PI*2);cx.stroke();
+document.getElementById('appIcon').href=cv.toDataURL('image/png');
 
-  // ── Date ───────────────────────────────────────────────────
-  document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+// ── Manifest ──────────────────────────────────────────────
+const ml=document.createElement('link');
+ml.rel='manifest';
+ml.href=URL.createObjectURL(new Blob([JSON.stringify({name:"Mon Assistant",short_name:"Assistant",start_url:"/Assistant-vocal/",display:"standalone",background_color:"#054f64",theme_color:"#054f64"})],{type:'application/json'}));
+document.head.appendChild(ml);
 
-  // ── Toast ──────────────────────────────────────────────────
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent=msg; t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2500);
-  }
+// ── Date ──────────────────────────────────────────────────
+document.getElementById('dateDisplay').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+document.getElementById('addDate').value=new Date().toISOString().split('T')[0];
 
-  // ── Clé Groq ───────────────────────────────────────────────
-  let GROQ_KEY = localStorage.getItem('groq_key')||'';
-  if (GROQ_KEY) document.getElementById('apiKey').value=GROQ_KEY;
-  function saveKey() {
-    GROQ_KEY=document.getElementById('apiKey').value.trim();
-    localStorage.setItem('groq_key',GROQ_KEY);
-    showToast('✅ Clé sauvegardée !');
-  }
-  window.saveKey=saveKey;
+// ── Toast ─────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
 
-  // ── Google Auth ────────────────────────────────────────────
-  const G_CLIENT_ID='388486752894-ekeiej8dkbq6iql51cifhphe828nrn8e.apps.googleusercontent.com';
-  const G_SCOPES='https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks';
-  let gToken=sessionStorage.getItem('g_token')||null;
-  let tokenClient=null;
+// ── Tabs ──────────────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const pages=['vocal','dashboard','add'];
+    t.classList.toggle('active',pages[i]===name);
+    document.getElementById('page-'+pages[i]).classList.toggle('active',pages[i]===name);
+  });
+  if(name==='dashboard') loadDashboard();
+}
+window.switchTab=switchTab;
 
-  if (gToken) {
-    document.getElementById('msBtn').textContent='✅ Google connecté';
-    document.getElementById('msBtn').style.background='#076880';
-    document.getElementById('dashSection').style.display='block';
-    loadDashboard();
-  }
+// ── Google Auth ───────────────────────────────────────────
+const G_CLIENT_ID='388486752894-ekeiej8dkbq6iql51cifhphe828nrn8e.apps.googleusercontent.com';
+const G_SCOPES='https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks';
+let gToken=sessionStorage.getItem('g_token')||null;
+let tokenClient=null;
 
-  function initGoogleAuth() {
-    if (typeof google==='undefined') { setTimeout(initGoogleAuth,300); return; }
-    tokenClient=google.accounts.oauth2.initTokenClient({
-      client_id:G_CLIENT_ID, scope:G_SCOPES,
-      callback:(resp)=>{
-        if (resp.error) { showToast('❌ '+resp.error); return; }
-        gToken=resp.access_token;
-        sessionStorage.setItem('g_token',gToken);
-        document.getElementById('msBtn').textContent='✅ Google connecté';
-        document.getElementById('msBtn').style.background='#076880';
-        document.getElementById('dashSection').style.display='block';
-        showToast('✅ Connecté à Google !');
-        loadDashboard();
-      }
-    });
-  }
-  initGoogleAuth();
+function updateGoogleBtn(){
+  const btn=document.getElementById('msBtn');
+  if(gToken){btn.textContent='✅ Google connecté';btn.style.background='#076880';}
+}
+updateGoogleBtn();
 
-  function signInGoogle() {
-    if (!tokenClient) { showToast('⏳ Chargement...'); return; }
-    tokenClient.requestAccessToken();
-  }
-  window.signInGoogle=signInGoogle;
-
-  // ── Google Calendar ────────────────────────────────────────
-  async function createCalendarEvent(task) {
-    if (!gToken) return;
-    const date=task.date||new Date().toISOString().split('T')[0];
-    const body=task.heure ? {
-      summary:task.titre,
-      start:{dateTime:date+'T'+task.heure+':00',timeZone:'Europe/Paris'},
-      end:{dateTime:new Date(new Date(date+'T'+task.heure+':00').getTime()+3600000).toISOString(),timeZone:'Europe/Paris'}
-    } : {
-      summary:task.titre,
-      start:{date:date},
-      end:{date:date}
-    };
-    await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events',{
-      method:'POST',
-      headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},
-      body:JSON.stringify(body)
-    });
-  }
-
-  // ── Google Tasks ───────────────────────────────────────────
-  async function createTask(task) {
-    if (!gToken) return;
-    const lr=await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists',{headers:{'Authorization':'Bearer '+gToken}});
-    const ld=await lr.json();
-    const listId=ld.items[0].id;
-    await fetch('https://tasks.googleapis.com/tasks/v1/lists/'+listId+'/tasks',{
-      method:'POST',
-      headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},
-      body:JSON.stringify({title:task.titre})
-    });
-  }
-
-  // ── Dashboard ──────────────────────────────────────────────
-  async function loadDashboard() {
-    if (!gToken) return;
-    const dash=document.getElementById('dashboard');
-    dash.innerHTML='<div class="empty">Chargement...</div>';
-    try {
-      const now=new Date();
-      const in7=new Date(now.getTime()+7*24*3600*1000);
-      const calRes=await fetch(
-        'https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin='+now.toISOString()+'&timeMax='+in7.toISOString()+'&orderBy=startTime&singleEvents=true&maxResults=10',
-        {headers:{'Authorization':'Bearer '+gToken}}
-      );
-      const calData=await calRes.json();
-      const events=calData.items||[];
-
-      const lr=await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists',{headers:{'Authorization':'Bearer '+gToken}});
-      const ld=await lr.json();
-      const listId=ld.items[0].id;
-      const tr=await fetch('https://tasks.googleapis.com/tasks/v1/lists/'+listId+'/tasks?showCompleted=false&maxResults=10',{headers:{'Authorization':'Bearer '+gToken}});
-      const td=await tr.json();
-      const tasks=td.items||[];
-
-      let html='';
-      if (events.length) {
-        events.forEach(e=>{
-          const d=e.start.dateTime||e.start.date;
-          const date=new Date(d).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
-          const time=e.start.dateTime?' · '+new Date(e.start.dateTime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
-          html+=`<div class="card"><div class="card-title">📅 ${e.summary}</div><div class="card-meta">${date}${time}</div></div>`;
-        });
-      }
-      if (tasks.length) {
-        tasks.forEach(t=>{
-          html+=`<div class="card"><div class="card-title">✅ ${t.title}</div></div>`;
-        });
-      }
-      if (!html) html='<div class="empty">Aucun événement ni tâche à venir 🎉</div>';
-      dash.innerHTML=html;
-    } catch(e) {
-      dash.innerHTML='<div class="empty">Erreur : '+e.message+'</div>';
+function initGoogleAuth(){
+  if(typeof google==='undefined'){setTimeout(initGoogleAuth,300);return;}
+  tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:G_CLIENT_ID,scope:G_SCOPES,
+    callback:(resp)=>{
+      if(resp.error){showToast('❌ '+resp.error);return;}
+      gToken=resp.access_token;
+      sessionStorage.setItem('g_token',gToken);
+      updateGoogleBtn();
+      showToast('✅ Connecté à Google !');
+      loadDashboard();
     }
-  }
+  });
+}
+initGoogleAuth();
 
-  // ── Micro ──────────────────────────────────────────────────
-  let recognition=null, isRecording=false;
+function signInGoogle(){
+  if(!tokenClient){showToast('⏳ Chargement...');return;}
+  tokenClient.requestAccessToken();
+}
+window.signInGoogle=signInGoogle;
 
-  function toggleRecording() {
-    if (!GROQ_KEY) { showToast('⚠️ Entre ta clé Groq d\'abord !'); return; }
-    isRecording ? stopRecording() : startRecording();
-  }
-  window.toggleRecording=toggleRecording;
+// ── Google Calendar ───────────────────────────────────────
+async function createCalendarEvent(titre,date,heure,cat){
+  if(!gToken)return;
+  const body=heure?{
+    summary:`[${cat}] ${titre}`,
+    start:{dateTime:date+'T'+heure+':00',timeZone:'Europe/Paris'},
+    end:{dateTime:new Date(new Date(date+'T'+heure+':00').getTime()+3600000).toISOString().replace('Z',''),timeZone:'Europe/Paris'}
+  }:{
+    summary:`[${cat}] ${titre}`,
+    start:{date},end:{date}
+  };
+  const r=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events',{
+    method:'POST',headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  return r.ok;
+}
 
-  function startRecording() {
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if (!SR) { showToast('❌ Micro non supporté'); return; }
-    recognition=new SR();
-    recognition.lang='fr-FR';
-    recognition.continuous=false;
-    recognition.interimResults=true;
-    let final='';
+// ── Google Tasks ──────────────────────────────────────────
+let cachedListId=null;
+async function getListId(){
+  if(cachedListId)return cachedListId;
+  const r=await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists',{headers:{'Authorization':'Bearer '+gToken}});
+  const d=await r.json();
+  cachedListId=d.items[0].id;
+  return cachedListId;
+}
 
-    recognition.onstart=()=>{
-      isRecording=true; final='';
-      document.getElementById('micBtn').classList.add('recording');
-      document.getElementById('micBtn').textContent='⏹️';
-      document.getElementById('micLabel').textContent='En écoute...';
-      document.getElementById('transcriptBox').classList.add('visible');
-      document.getElementById('transcriptText').textContent='...';
-    };
-    recognition.onresult=e=>{
-      let interim='';
-      for (let i=e.resultIndex;i<e.results.length;i++) {
-        if (e.results[i].isFinal) final+=e.results[i][0].transcript;
-        else interim+=e.results[i][0].transcript;
-      }
-      document.getElementById('transcriptText').textContent=final||interim||'...';
-    };
-    recognition.onerror=e=>{ showToast('❌ '+e.error); resetMic(); };
-    recognition.onend=()=>{
-      const txt=document.getElementById('transcriptText').textContent;
-      const best=final.trim()||txt.trim();
-      if (best&&best!=='...') analyzeWithGroq(best);
-      else { showToast('⚠️ Rien entendu, réessaie'); resetMic(); }
-    };
-    recognition.start();
-  }
+async function createGoogleTask(titre,date,cat){
+  if(!gToken)return;
+  const listId=await getListId();
+  const body={title:`[${cat}] ${titre}`};
+  if(date)body.due=date+'T00:00:00.000Z';
+  const r=await fetch('https://tasks.googleapis.com/tasks/v1/lists/'+listId+'/tasks',{
+    method:'POST',headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  return r.ok;
+}
 
-  function stopRecording() { if (recognition) recognition.stop(); resetMic(); }
+// ── Ajout manuel ──────────────────────────────────────────
+async function addToCalendar(){
+  const titre=document.getElementById('addTitle').value.trim();
+  const cat=document.getElementById('addCat').value;
+  const date=document.getElementById('addDate').value;
+  const heure=document.getElementById('addTime').value;
+  if(!titre){showToast('⚠️ Entre un titre');return;}
+  if(!gToken){showToast('⚠️ Connecte Google d\'abord');return;}
+  const ok=await createCalendarEvent(titre,date,heure,cat);
+  if(ok){showToast('✅ Ajouté dans Calendar !');document.getElementById('addTitle').value='';}
+  else showToast('❌ Erreur Calendar');
+}
+window.addToCalendar=addToCalendar;
 
-  function resetMic() {
-    isRecording=false;
-    const btn=document.getElementById('micBtn');
-    btn.classList.remove('recording','loading');
-    btn.textContent='🎙️';
-    document.getElementById('micLabel').textContent='Appuie pour parler';
-  }
+async function addToTasks(){
+  const titre=document.getElementById('addTitle').value.trim();
+  const cat=document.getElementById('addCat').value;
+  const date=document.getElementById('addDate').value;
+  if(!titre){showToast('⚠️ Entre un titre');return;}
+  if(!gToken){showToast('⚠️ Connecte Google d\'abord');return;}
+  const ok=await createGoogleTask(titre,date,cat);
+  if(ok){showToast('✅ Ajouté dans Tasks !');document.getElementById('addTitle').value='';}
+  else showToast('❌ Erreur Tasks');
+}
+window.addToTasks=addToTasks;
 
-  // ── Groq ───────────────────────────────────────────────────
-  async function analyzeWithGroq(transcript) {
-    const btn=document.getElementById('micBtn');
-    btn.classList.add('loading'); btn.textContent='⏳';
-    document.getElementById('micLabel').textContent='L\'IA analyse...';
+// ── Dashboard ─────────────────────────────────────────────
+async function loadDashboard(){
+  if(!gToken){return;}
+  const dash=document.getElementById('dashboard');
+  dash.innerHTML='<div style="color:#B5CAC1;text-align:center;padding:20px">Chargement...</div>';
+  try{
+    const now=new Date();
+    const in14=new Date(now.getTime()+14*24*3600*1000);
+    const calR=await fetch(
+      'https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin='+now.toISOString()+'&timeMax='+in14.toISOString()+'&orderBy=startTime&singleEvents=true&maxResults=30',
+      {headers:{'Authorization':'Bearer '+gToken}}
+    );
+    const calD=await calR.json();
+    const events=(calD.items||[]);
 
-    const today=new Date();
-    const prompt=`Tu es un assistant personnel. L'utilisateur te parle le matin.
-Date et heure actuelles : ${today.toLocaleString('fr-FR',{timeZone:'Europe/Paris'})}
-Jour actuel : ${today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+    const listId=await getListId();
+    const tR=await fetch('https://tasks.googleapis.com/tasks/v1/lists/'+listId+'/tasks?showCompleted=false&maxResults=30',{headers:{'Authorization':'Bearer '+gToken}});
+    const tD=await tR.json();
+    const tasks=(tD.items||[]);
 
-Voici ce qu'il a dit : "${transcript}"
+    // Catégoriser avec l'IA
+    const allItems=[
+      ...events.map(e=>({id:e.id,titre:e.summary||'Sans titre',type:'event',date:e.start.dateTime||e.start.date,heure:e.start.dateTime?new Date(e.start.dateTime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):''})),
+      ...tasks.map(t=>({id:t.id,titre:t.title||'Sans titre',type:'task',date:t.due?t.due.split('T')[0]:''}))
+    ];
 
-IMPORTANT pour les dates :
-- Si l'utilisateur dit "demain", calcule la date de demain
-- Si l'utilisateur dit "lundi", "mardi" etc., calcule la prochaine occurrence
-- Si l'utilisateur dit "dans X jours", calcule correctement
-- Toujours mettre la date ISO dans le champ "date" (format YYYY-MM-DD)
+    if(!allItems.length){
+      dash.innerHTML='<div style="color:#B5CAC1;text-align:center;padding:30px">Aucun élément à venir 🎉</div>';
+      return;
+    }
 
-Réponds en JSON uniquement, sans markdown, sans backticks :
-{"reponse":"réponse naturelle 2-3 phrases","taches":[{"titre":"titre","date":"YYYY-MM-DD","heure":"HH:MM ou vide","type":"urgent|normal|rappel"}]}`;
+    // Tri par catégorie via IA
+    const aiPrompt=`Analyse ces éléments et classe-les dans les catégories : urgences, travail, projets, personnel.
+Réponds UNIQUEMENT en JSON : {"urgences":[],"travail":[],"projets":[],"personnel":[]}
+Chaque tableau contient les indices (0-based) des éléments correspondants.
+Éléments : ${allItems.map((it,i)=>`${i}: "${it.titre}"`).join(', ')}`;
 
-    try {
-      const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    let cats={urgences:[],travail:[],projets:[],personnel:[]};
+    try{
+      const aiR=await fetch('https://api.groq.com/openai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.7})
+        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:aiPrompt}],temperature:0.3,max_tokens:500})
       });
-      const data=await res.json();
-      if (data.error) { showToast('❌ '+data.error.message); resetMic(); return; }
-      const parsed=JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
+      const aiD=await aiR.json();
+      const raw=aiD.choices[0].message.content.replace(/```json|```/g,'').trim();
+      cats=JSON.parse(raw);
+    }catch(e){}
 
-      document.getElementById('responseText').textContent=parsed.reponse;
-      document.getElementById('responseBox').classList.add('visible');
-      showTasks(parsed.taches||[]);
-
-      if (gToken&&parsed.taches) {
-        for (const t of parsed.taches) {
-          await createCalendarEvent(t);
-          await createTask(t);
-        }
-        showToast('✅ Ajouté dans Google Calendar & Tasks !');
-        loadDashboard();
-      }
-      speak(parsed.reponse);
-    } catch(err) {
-      showToast('❌ '+err.message);
+    // Affichage par catégorie
+    const catLabels={urgences:'🚨 Urgences',travail:'💼 Travail',projets:'🚀 Projets',personnel:'👤 Personnel'};
+    let html='';
+    for(const [cat,indices] of Object.entries(cats)){
+      if(!indices.length)continue;
+      html+=`<div class="sec-title">${catLabels[cat]}</div>`;
+      indices.forEach(i=>{
+        const it=allItems[i];
+        if(!it)return;
+        const dateStr=it.date?new Date(it.date).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}):'';
+        html+=`<div class="card slide">
+          <div class="task-row">
+            <div class="task-dot dot-${cat}"></div>
+            <div style="flex:1">
+              <div class="card-title">${it.titre.replace(/\[.*?\]\s*/,'')}</div>
+              <div class="card-meta">${it.type==='event'?'📅':'✅'} ${dateStr}${it.heure?' · '+it.heure:''}</div>
+            </div>
+          </div>
+        </div>`;
+      });
     }
-    resetMic();
+    dash.innerHTML=html||'<div style="color:#B5CAC1;text-align:center;padding:30px">Aucun élément à venir 🎉</div>';
+  }catch(e){
+    dash.innerHTML='<div style="color:#B5CAC1;text-align:center;padding:20px">Erreur : '+e.message+'</div>';
   }
+}
+window.loadDashboard=loadDashboard;
 
-  function showTasks(tasks) {
-    const list=document.getElementById('tasksList');
-    if (list.querySelector('.empty')) list.innerHTML='';
-    tasks.forEach(t=>{
-      const dot=t.type==='urgent'?'dot-urgent':t.type==='rappel'?'dot-reminder':'dot-normal';
-      const card=document.createElement('div');
-      card.className='card task-card';
-      card.innerHTML=`<div class="task-dot ${dot}"></div>
-        <div style="flex:1"><div class="card-title">${t.titre}</div>
-        <div class="card-meta">${t.type}${t.date?' · '+t.date:''}${t.heure?' · '+t.heure:''}</div></div>
-        <div class="task-check" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':''"></div>`;
-      list.appendChild(card);
+// ── Micro ─────────────────────────────────────────────────
+let recognition=null,isRecording=false;
+
+function toggleRecording(){
+  isRecording?stopRecording():startRecording();
+}
+window.toggleRecording=toggleRecording;
+
+function startRecording(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showToast('❌ Micro non supporté');return;}
+  recognition=new SR();
+  recognition.lang='fr-FR';recognition.continuous=false;recognition.interimResults=true;
+  let final='';
+  recognition.onstart=()=>{
+    isRecording=true;final='';
+    document.getElementById('micBtn').classList.add('recording');
+    document.getElementById('micBtn').textContent='⏹️';
+    document.getElementById('micLabel').textContent='En écoute...';
+    document.getElementById('transcriptBox').classList.add('visible');
+    document.getElementById('transcriptText').textContent='...';
+  };
+  recognition.onresult=e=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    document.getElementById('transcriptText').textContent=final||interim||'...';
+  };
+  recognition.onerror=e=>{showToast('❌ '+e.error);resetMic();};
+  recognition.onend=()=>{
+    const txt=document.getElementById('transcriptText').textContent;
+    const best=final.trim()||txt.trim();
+    if(best&&best!=='...')analyzeWithGroq(best);
+    else{showToast('⚠️ Rien entendu');resetMic();}
+  };
+  recognition.start();
+}
+
+function stopRecording(){if(recognition)recognition.stop();resetMic();}
+
+function resetMic(){
+  isRecording=false;
+  const btn=document.getElementById('micBtn');
+  btn.classList.remove('recording','loading');
+  btn.textContent='🎙️';
+  document.getElementById('micLabel').textContent='Appuie pour parler';
+}
+
+// ── Groq ──────────────────────────────────────────────────
+async function analyzeWithGroq(transcript){
+  document.getElementById('micBtn').classList.add('loading');
+  document.getElementById('micBtn').textContent='⏳';
+  document.getElementById('micLabel').textContent='Analyse...';
+
+  const today=new Date();
+  const todayISO=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+
+  function nextDay(target){
+    const d=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    let diff=target-d.getDay();
+    if(diff<=0)diff+=7;
+    d.setDate(d.getDate()+diff);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  const tom=new Date(today.getFullYear(),today.getMonth(),today.getDate()+1);
+  const tomISO=tom.getFullYear()+'-'+String(tom.getMonth()+1).padStart(2,'0')+'-'+String(tom.getDate()).padStart(2,'0');
+
+  const daysMap={'lundi':nextDay(1),'mardi':nextDay(2),'mercredi':nextDay(3),'jeudi':nextDay(4),'vendredi':nextDay(5),'samedi':nextDay(6),'dimanche':nextDay(0),'demain':tomISO};
+
+  const prompt=`Tu es un assistant personnel. L'utilisateur te parle le matin.
+Aujourd'hui : ${today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} (${todayISO})
+
+Correspondance EXACTE des dates :
+${Object.entries(daysMap).map(([k,v])=>`"${k}" = ${v}`).join(', ')}
+
+Message : "${transcript}"
+
+RÈGLES :
+- Utilise EXACTEMENT les dates ci-dessus, ne recalcule jamais
+- Catégorie parmi : urgences, travail, projets, personnel
+- Si pas de jour mentionné → aujourd'hui : ${todayISO}
+
+JSON uniquement sans markdown :
+{"reponse":"2-3 phrases naturelles","taches":[{"titre":"titre","date":"YYYY-MM-DD","heure":"HH:MM ou vide","type":"urgent|normal|rappel","categorie":"urgences|travail|projets|personnel"}]}`;
+
+  try{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.7})
     });
-  }
+    const data=await res.json();
+    if(data.error){showToast('❌ '+data.error.message);resetMic();return;}
+    const parsed=JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
 
-  function speak(text) {
-    if (!window.speechSynthesis) return;
-    const u=new SpeechSynthesisUtterance(text);
-    u.lang='fr-FR'; u.rate=1.05;
-    window.speechSynthesis.speak(u);
+    document.getElementById('responseText').textContent=parsed.reponse;
+    document.getElementById('responseBox').classList.add('visible');
+
+    // Affiche tâches du jour
+    const todayList=document.getElementById('todayTasks');
+    if(parsed.taches&&parsed.taches.length){
+      if(!todayList.querySelector('.sec-title'))todayList.innerHTML='<div class="sec-title">Tâches ajoutées</div>';
+      parsed.taches.forEach(t=>{
+        const cat=t.categorie||'travail';
+        const card=document.createElement('div');
+        card.className='card slide';
+        card.innerHTML=`<div class="task-row">
+          <div class="task-dot dot-${cat}"></div>
+          <div style="flex:1">
+            <div class="card-title">${t.titre}</div>
+            <div class="card-meta"><span class="cat-badge cat-${cat}">${cat}</span>${t.date?' · '+new Date(t.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}):''}${t.heure?' · '+t.heure:''}</div>
+          </div>
+          <div class="check" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':''"></div>
+        </div>`;
+        todayList.appendChild(card);
+      });
+
+      // Sync Google
+      if(gToken){
+        for(const t of parsed.taches){
+          await createCalendarEvent(t.titre,t.date||todayISO,t.heure,t.categorie||'travail');
+          await createGoogleTask(t.titre,t.date||todayISO,t.categorie||'travail');
+        }
+        showToast('✅ Sync Google Calendar & Tasks !');
+      }
+    }
+
+    speak(parsed.reponse);
+  }catch(err){
+    showToast('❌ '+err.message);
   }
+  resetMic();
+}
+
+function speak(text){
+  if(!window.speechSynthesis)return;
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='fr-FR';u.rate=1.05;
+  window.speechSynthesis.speak(u);
+}
 
 })();
 </script>
