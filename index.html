@@ -453,10 +453,16 @@ function playBrief(){
     if(!it.date)return true;
     return new Date(it.date+'T12:00:00')<=cutoff;
   });
-  var prompt='Tu es une secrétaire professionnelle. Brief vocal naturel de '+days+' jours.\n'
+  var prompt='Tu es une assistante personnelle, voix féminine, directe, efficace et légèrement humoristique.\n'
+    +'Fais un brief ULTRA court et concret de '+days+' jours. RÈGLES STRICTES :\n'
+    +'- Commence par 2-3 mots qui résument la charge (ex: "Semaine tranquille.", "Ça va chauffer.", "Accroche-toi bien.")\n'
+    +'- Liste les tâches/événements de manière directe, une phrase par item max\n'
+    +'- Zéro introduction, zéro conseil, zéro "Bonjour"\n'
+    +'- Humour subtil bienvenu mais reste efficace\n'
+    +'- 5-7 phrases max au total\n'
     +'Éléments : '+items.map(function(it){
-      return it.cat+':"'+it.titre.replace(/\[.*?\]\s*/g,'')+'"'+(it.date?' le '+new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):'')+(it.heure?' à '+it.heure:'');
-    }).join(', ')+'.\nCommence par "Bonjour,". 5-8 phrases. Priorise urgences. Conseil final.';
+      return'"'+it.titre.replace(/\[.*?\]\s*/g,'')+'"'+(it.date?' le '+new Date(it.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):'')+(it.heure?' à '+it.heure:'');
+    }).join(', ')+'.';
 
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
@@ -467,7 +473,8 @@ function playBrief(){
   .then(function(d){
     var brief=d.choices[0].message.content;
     window.speechSynthesis.cancel();
-    var u=new SpeechSynthesisUtterance(brief);
+    u.lang='fr-FR';u.rate=1.05;u.pitch=1.1;u.volume=1;
+    window.speechSynthesis.speak(u);
     u.lang='fr-FR';u.rate=1.0;u.pitch=1.0;u.volume=1;
     window.speechSynthesis.speak(u);
   })
