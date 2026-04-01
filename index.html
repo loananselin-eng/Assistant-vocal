@@ -7,7 +7,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Assistant">
 <link rel="apple-touch-icon" id="appIcon" href="">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <title>Mon Assistant</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;color:#fff}
@@ -47,8 +46,7 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 .score-bar{display:flex;gap:8px;margin-bottom:14px}
 .score-day{flex:1;background:#043d4f;border:1px solid rgba(181,202,193,0.2);border-radius:10px;padding:10px 8px;text-align:center}
 .dn{font-size:11px;color:#B5CAC1;margin-bottom:4px}
-.ds{font-size:18px}
-.dl{font-size:10px;margin-top:2px}
+.ds{font-size:18px}.dl{font-size:10px;margin-top:2px}
 .sl{color:#2ed573}.sm{color:#f39c12}.sh{color:#ff4757}
 .focus-btn{display:flex;align-items:center;gap:8px;background:#043d4f;border:1px solid rgba(181,202,193,0.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;cursor:pointer}
 .toggle{width:36px;height:20px;background:#076880;border-radius:10px;position:relative;flex-shrink:0;transition:background 0.2s}
@@ -88,6 +86,11 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 .week-detail{background:#043d4f;border:1px solid rgba(181,202,193,0.25);border-radius:12px;padding:12px;margin-bottom:14px;display:none}
 .week-detail.visible{display:block}
 .wdt{font-size:11px;color:#B5CAC1;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em}
+.email-card{background:#043d4f;border:1px solid rgba(181,202,193,0.25);border-radius:12px;padding:12px;margin-bottom:8px}
+.email-from{font-size:12px;color:#B5CAC1;margin-bottom:3px}
+.email-subject{font-size:14px;font-weight:500;margin-bottom:6px}
+.email-actions{display:flex;gap:6px}
+.email-actions button{flex:1;background:#076880;border:1px solid rgba(181,202,193,0.3);border-radius:8px;padding:6px;font-size:11px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -116,13 +119,14 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 <div class="tabs">
   <div class="tab active" onclick="switchTab('vocal')">🎙️</div>
   <div class="tab" onclick="switchTab('dashboard')">📊</div>
+  <div class="tab" onclick="switchTab('emails')">📧</div>
   <div class="tab" onclick="switchTab('add')">➕</div>
   <div class="tab" onclick="switchTab('profile')">👤</div>
 </div>
 
 <!-- VOCAL -->
 <div class="page active" id="page-vocal">
-  <button class="btn" id="msBtn" onclick="signInGoogle()">🔗 Connecter Google</button>
+  <button class="btn" id="msBtn" onclick="signInMicrosoft()">🔗 Connecter Microsoft</button>
   <div class="mic-area">
     <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎙️</button>
     <div class="mic-label" id="micLabel">Appuie pour parler</div>
@@ -151,7 +155,16 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
     <button onclick="playBrief()" style="background:#B5CAC1;border:none;border-radius:10px;padding:10px 14px;font-size:13px;cursor:pointer;color:#054f64;font-weight:600;white-space:nowrap;flex-shrink:0">🔊 Brief</button>
     <button onclick="loadDashboard()" style="background:#076880;border:1px solid rgba(181,202,193,0.4);border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;flex-shrink:0">🔄</button>
   </div>
-  <div id="dashboard"><div class="empty">Connecte Google pour voir ton dashboard</div></div>
+  <div id="dashboard"><div class="empty">Connecte Microsoft pour voir ton dashboard</div></div>
+</div>
+
+<!-- EMAILS -->
+<div class="page" id="page-emails">
+  <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+    <div style="flex:1;font-size:13px;color:#B5CAC1">Emails non lus — extraction IA</div>
+    <button onclick="loadEmails()" style="background:#076880;border:1px solid rgba(181,202,193,0.4);border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer">🔄</button>
+  </div>
+  <div id="emailsList"><div class="empty">Connecte Microsoft et clique 🔄</div></div>
 </div>
 
 <!-- AJOUTER -->
@@ -171,7 +184,7 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
     </div>
     <div class="acts">
       <button class="btn-ash" onclick="addToCalendar()">📅 Calendar</button>
-      <button class="btn-ash" onclick="addToTasks()">✅ Tasks</button>
+      <button class="btn-ash" onclick="addToTasks()">✅ To Do</button>
     </div>
   </div>
 </div>
@@ -205,14 +218,15 @@ h1{font-size:21px;font-weight:600;display:flex;align-items:center;justify-conten
 
 <script>
 var GROQ_KEY='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';
-var G_CLIENT_ID='388486752894-ekeiej8dkbq6iql51cifhphe828nrn8e.apps.googleusercontent.com';
-var G_SCOPES='https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks';
-var gToken=sessionStorage.getItem('g_token')||null;
-var tokenClient=null;
+var MS_CLIENT_ID='aba8e3d7-d506-4030-bd57-4e5e9b9ea5a6';
+var MS_TENANT='52c529f8-1763-4cbb-98a2-0a210f5cb679';
+var MS_REDIRECT='https://loananselin-eng.github.io/Assistant-vocal/';
+var MS_SCOPES='Calendars.ReadWrite Tasks.ReadWrite Mail.Read User.Read offline_access';
+var msToken=sessionStorage.getItem('ms_token')||null;
 var focusMode=false;
 var hiddenEvents=JSON.parse(localStorage.getItem('hidden_events')||'{}');
 var allDashItems=[];
-var cachedListId=null;
+var cachedTodoListId=null;
 var selectedItemId=null;
 var memory={
   profile:JSON.parse(localStorage.getItem('user_profile')||'{}'),
@@ -256,13 +270,14 @@ function showToast(msg){
 }
 
 function switchTab(name){
-  var pages=['vocal','dashboard','add','profile'];
+  var pages=['vocal','dashboard','emails','add','profile'];
   pages.forEach(function(p,i){
     document.querySelectorAll('.tab')[i].classList.toggle('active',p===name);
     document.getElementById('page-'+p).classList.toggle('active',p===name);
   });
   if(name==='dashboard')loadDashboard();
   if(name==='profile')renderProfile();
+  if(name==='emails')loadEmails();
 }
 
 function toggleFocus(){
@@ -271,60 +286,112 @@ function toggleFocus(){
   renderDashboard();
 }
 
-function updateGBtn(){
-  if(gToken){
-    document.getElementById('msBtn').textContent='✅ Google connecté';
+// ── Microsoft Auth PKCE ───────────────────────────────────
+function generateRandom(len){
+  var arr=new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode.apply(null,arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+
+function sha256(plain){
+  var enc=new TextEncoder().encode(plain);
+  return crypto.subtle.digest('SHA-256',enc).then(function(hash){
+    return btoa(String.fromCharCode.apply(null,new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  });
+}
+
+function signInMicrosoft(){
+  var verifier=generateRandom(64);
+  sessionStorage.setItem('pkce_verifier',verifier);
+  var state=generateRandom(16);
+  sessionStorage.setItem('pkce_state',state);
+  sha256(verifier).then(function(challenge){
+    var url='https://login.microsoftonline.com/'+MS_TENANT+'/oauth2/v2.0/authorize'
+      +'?client_id='+MS_CLIENT_ID
+      +'&response_type=code'
+      +'&redirect_uri='+encodeURIComponent(MS_REDIRECT)
+      +'&scope='+encodeURIComponent(MS_SCOPES)
+      +'&state='+state
+      +'&code_challenge='+challenge
+      +'&code_challenge_method=S256';
+    window.location.href=url;
+  });
+}
+
+function checkMsCallback(){
+  var params=new URLSearchParams(window.location.search);
+  var code=params.get('code');
+  var state=params.get('state');
+  if(!code)return;
+  if(state!==sessionStorage.getItem('pkce_state')){showToast('❌ Erreur state');return;}
+  var verifier=sessionStorage.getItem('pkce_verifier');
+  history.replaceState(null,'',window.location.pathname);
+  fetch('https://login.microsoftonline.com/'+MS_TENANT+'/oauth2/v2.0/token',{
+    method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:new URLSearchParams({client_id:MS_CLIENT_ID,grant_type:'authorization_code',code:code,redirect_uri:MS_REDIRECT,code_verifier:verifier,scope:MS_SCOPES})
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.access_token){
+      msToken=d.access_token;
+      sessionStorage.setItem('ms_token',msToken);
+      updateMsBtn();
+      showToast('✅ Microsoft connecté !');
+      loadDashboard();
+    } else {
+      showToast('❌ '+(d.error_description||d.error||'Erreur auth'));
+    }
+  })
+  .catch(function(e){showToast('❌ '+e.message);});
+}
+
+function updateMsBtn(){
+  if(msToken){
+    document.getElementById('msBtn').textContent='✅ Microsoft connecté';
     document.getElementById('msBtn').style.background='#076880';
   }
 }
-updateGBtn();
+updateMsBtn();
+checkMsCallback();
 
-function initGA(){
-  if(typeof google==='undefined'){setTimeout(initGA,300);return;}
-  tokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:G_CLIENT_ID,scope:G_SCOPES,
-    callback:function(r){
-      if(r.error){showToast('❌ '+r.error);return;}
-      gToken=r.access_token;
-      sessionStorage.setItem('g_token',gToken);
-      updateGBtn();
-      showToast('✅ Google connecté !');
-      loadDashboard();
-    }
-  });
-}
-initGA();
-
-function signInGoogle(){
-  if(!tokenClient){showToast('⏳ Chargement...');return;}
-  tokenClient.requestAccessToken();
+// ── Graph helpers ─────────────────────────────────────────
+function graphGet(url){
+  return fetch(url,{headers:{'Authorization':'Bearer '+msToken}}).then(function(r){return r.json();});
 }
 
-function getListId(){
-  if(cachedListId)return Promise.resolve(cachedListId);
-  return fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists',{headers:{'Authorization':'Bearer '+gToken}})
-    .then(function(r){return r.json();})
-    .then(function(d){cachedListId=d.items[0].id;return cachedListId;});
+function graphPost(url,body){
+  return fetch(url,{method:'POST',headers:{'Authorization':'Bearer '+msToken,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json();});
 }
 
+// ── Calendar ──────────────────────────────────────────────
 function createCalendarEvent(titre,date,heure,cat){
-  if(!gToken)return Promise.resolve(false);
-  var body=heure
-    ?{summary:'['+cat+'] '+titre,start:{dateTime:date+'T'+heure+':00',timeZone:'Europe/Paris'},end:{dateTime:new Date(new Date(date+'T'+heure+':00').getTime()+3600000).toISOString().replace('Z',''),timeZone:'Europe/Paris'}}
-    :{summary:'['+cat+'] '+titre,start:{date:date},end:{date:date}};
-  return fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events',{
-    method:'POST',headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},body:JSON.stringify(body)
-  }).then(function(r){return r.ok;});
+  if(!msToken)return Promise.resolve(false);
+  var body;
+  if(heure){
+    var start=date+'T'+heure+':00';
+    var end=new Date(new Date(start).getTime()+3600000).toISOString();
+    body={subject:'['+cat+'] '+titre,start:{dateTime:start,timeZone:'Europe/Paris'},end:{dateTime:end,timeZone:'Europe/Paris'}};
+  } else {
+    body={subject:'['+cat+'] '+titre,isAllDay:true,start:{dateTime:date+'T00:00:00',timeZone:'Europe/Paris'},end:{dateTime:date+'T00:00:00',timeZone:'Europe/Paris'}};
+  }
+  return graphPost('https://graph.microsoft.com/v1.0/me/events',body).then(function(r){return !!r.id;});
 }
 
-function createGoogleTask(titre,date,cat){
-  if(!gToken)return Promise.resolve(false);
-  return getListId().then(function(listId){
+// ── To Do ─────────────────────────────────────────────────
+function getTodoListId(){
+  if(cachedTodoListId)return Promise.resolve(cachedTodoListId);
+  return graphGet('https://graph.microsoft.com/v1.0/me/todo/lists')
+    .then(function(d){cachedTodoListId=d.value[0].id;return cachedTodoListId;});
+}
+
+function createTodoTask(titre,date,cat){
+  if(!msToken)return Promise.resolve(false);
+  return getTodoListId().then(function(listId){
     var body={title:'['+cat+'] '+titre};
-    if(date)body.due=date+'T00:00:00.000Z';
-    return fetch('https://tasks.googleapis.com/tasks/v1/lists/'+listId+'/tasks',{
-      method:'POST',headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'},body:JSON.stringify(body)
-    }).then(function(r){return r.ok;});
+    if(date)body.dueDateTime={dateTime:date+'T00:00:00.000Z',timeZone:'UTC'};
+    return graphPost('https://graph.microsoft.com/v1.0/me/todo/lists/'+listId+'/tasks',body)
+      .then(function(r){return !!r.id;});
   });
 }
 
@@ -334,7 +401,7 @@ function addToCalendar(){
   var date=document.getElementById('addDate').value;
   var heure=document.getElementById('addTime').value;
   if(!titre){showToast('⚠️ Entre un titre');return;}
-  if(!gToken){showToast('⚠️ Connecte Google');return;}
+  if(!msToken){showToast('⚠️ Connecte Microsoft');return;}
   createCalendarEvent(titre,date,heure,cat).then(function(ok){
     if(ok){showToast('✅ Ajouté dans Calendar !');document.getElementById('addTitle').value='';}
     else showToast('❌ Erreur Calendar');
@@ -346,13 +413,66 @@ function addToTasks(){
   var cat=document.getElementById('addCat').value;
   var date=document.getElementById('addDate').value;
   if(!titre){showToast('⚠️ Entre un titre');return;}
-  if(!gToken){showToast('⚠️ Connecte Google');return;}
-  createGoogleTask(titre,date,cat).then(function(ok){
-    if(ok){showToast('✅ Ajouté dans Tasks !');document.getElementById('addTitle').value='';}
-    else showToast('❌ Erreur Tasks');
+  if(!msToken){showToast('⚠️ Connecte Microsoft');return;}
+  createTodoTask(titre,date,cat).then(function(ok){
+    if(ok){showToast('✅ Ajouté dans To Do !');document.getElementById('addTitle').value='';}
+    else showToast('❌ Erreur To Do');
   });
 }
 
+// ── Emails ────────────────────────────────────────────────
+function loadEmails(){
+  if(!msToken){showToast('⚠️ Connecte Microsoft');return;}
+  var list=document.getElementById('emailsList');
+  list.innerHTML='<div class="empty">Chargement emails...</div>';
+  graphGet('https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$filter=isRead eq false&$top=10&$select=subject,from,receivedDateTime,bodyPreview&$orderby=receivedDateTime desc')
+  .then(function(d){
+    var emails=d.value||[];
+    if(!emails.length){list.innerHTML='<div class="empty">Aucun email non lu 🎉</div>';return;}
+    // Analyse IA pour extraire tâches
+    var emailSummaries=emails.map(function(e,i){
+      return i+'- De: '+e.from.emailAddress.name+' | Sujet: '+e.subject+' | Aperçu: '+e.bodyPreview.substring(0,100);
+    }).join('\n');
+    return fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:'Analyse ces emails et pour chacun dis si une action est requise et laquelle.\nJSON uniquement : [{"index":0,"action":"description courte ou null","urgent":true/false}]\nEmails:\n'+emailSummaries}],temperature:0.3,max_tokens:600})
+    })
+    .then(function(r){return r.json();})
+    .then(function(aiD){
+      var actions=[];
+      try{actions=JSON.parse(aiD.choices[0].message.content.replace(/```json|```/g,'').trim());}catch(ex){}
+      list.innerHTML='';
+      emails.forEach(function(e,i){
+        var action=actions.find(function(a){return a.index===i;});
+        var date=new Date(e.receivedDateTime).toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+        var card=document.createElement('div');card.className='email-card';
+        card.innerHTML='<div class="email-from">'+e.from.emailAddress.name+' · '+date+'</div>'
+          +'<div class="email-subject">'+(action&&action.urgent?'🚨 ':'')+e.subject+'</div>'
+          +(action&&action.action?'<div style="font-size:12px;color:#B5CAC1;margin-bottom:8px">→ '+action.action+'</div>':'')
+          +'<div class="email-actions">'
+          +(action&&action.action?'<button onclick="emailToTask(\''+e.subject.replace(/'/g,'')+'\',\''+((action&&action.action)||'').replace(/'/g,'')+'\')">✅ Créer tâche</button>':'')
+          +'<button onclick="emailToCalendar(\''+e.subject.replace(/'/g,'')+'\')">📅 Ajouter Calendar</button>'
+          +'</div>';
+        list.appendChild(card);
+      });
+    });
+  })
+  .catch(function(e){list.innerHTML='<div class="empty">Erreur : '+e.message+'</div>';});
+}
+
+function emailToTask(subject,action){
+  var titre=(action||subject).substring(0,60);
+  createTodoTask(titre,new Date().toISOString().split('T')[0],'travail')
+    .then(function(ok){showToast(ok?'✅ Tâche créée !':'❌ Erreur');});
+}
+
+function emailToCalendar(subject){
+  createCalendarEvent(subject,new Date().toISOString().split('T')[0],'','travail')
+    .then(function(ok){showToast(ok?'✅ Ajouté au Calendar !':'❌ Erreur');});
+}
+
+// ── Dashboard ─────────────────────────────────────────────
 function hideEvent(id,dateStr){
   hiddenEvents[id]={until:dateStr};
   localStorage.setItem('hidden_events',JSON.stringify(hiddenEvents));
@@ -386,75 +506,13 @@ function moveToCat(newCat){
   showToast('✅ Déplacé vers '+newCat);
 }
 
-// Mémoire
-function saveMemory(){
-  localStorage.setItem('user_profile',JSON.stringify(memory.profile));
-  localStorage.setItem('task_history',JSON.stringify(memory.history.slice(-50)));
-  localStorage.setItem('patterns',JSON.stringify(memory.patterns));
-}
-
-function addToHistory(taches){
-  var today=new Date().toISOString().split('T')[0];
-  taches.forEach(function(t){
-    memory.history.push({date:today,titre:t.titre,categorie:t.categorie,heure:t.heure});
-    if(t.heure){
-      var key='jour_'+new Date().getDay()+'_'+t.categorie;
-      memory.patterns[key]=(memory.patterns[key]||0)+1;
-    }
-  });
-  saveMemory();
-}
-
-function buildContext(){
-  var ctx='';
-  if(memory.profile.nom||memory.profile.projets){
-    ctx='CONTEXTE UTILISATEUR:\n';
-    if(memory.profile.nom)ctx+='Nom: '+memory.profile.nom+'\n';
-    if(memory.profile.poste)ctx+='Poste: '+memory.profile.poste+'\n';
-    if(memory.profile.projets)ctx+='Projets en cours: '+memory.profile.projets+'\n';
-    if(memory.profile.horaires)ctx+='Horaires: '+memory.profile.horaires+'\n';
-    if(memory.history.length){
-      ctx+='Tâches récentes: '+memory.history.slice(-8).map(function(h){return'"'+h.titre+'"('+h.date+')';}).join(', ')+'\n';
-    }
-  }
-  return ctx;
-}
-
-function saveProfile(){
-  memory.profile={
-    nom:document.getElementById('pNom').value.trim(),
-    poste:document.getElementById('pPoste').value.trim(),
-    projets:document.getElementById('pProjets').value.trim(),
-    horaires:document.getElementById('pHoraires').value.trim()
-  };
-  saveMemory();showToast('✅ Profil sauvegardé !');
-}
-
-function renderProfile(){
-  document.getElementById('pNom').value=memory.profile.nom||'';
-  document.getElementById('pPoste').value=memory.profile.poste||'';
-  document.getElementById('pProjets').value=memory.profile.projets||'';
-  document.getElementById('pHoraires').value=memory.profile.horaires||'';
-  var hist=document.getElementById('historyList');
-  if(!memory.history.length){hist.innerHTML='<div class="empty">Aucun historique</div>';return;}
-  hist.innerHTML=memory.history.slice(-15).reverse().map(function(h){
-    return'<div class="card"><div class="card-title">'+h.titre+'</div>'
-      +'<div class="card-meta"><span class="badge b-'+(h.categorie||'travail')+'">'+(h.categorie||'travail')+'</span> · '+h.date+'</div></div>';
-  }).join('');
-}
-
-function clearHistory(){
-  memory.history=[];memory.patterns={};saveMemory();renderProfile();showToast('✅ Effacé');
-}
-
-// Scores
 function computeScores(events){
   var scores={};
   var today=new Date();
   for(var i=0;i<3;i++){
     var d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+i);
     var ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    var cnt=events.filter(function(e){return(e.start.dateTime||e.start.date||'').startsWith(ds);}).length;
+    var cnt=events.filter(function(e){return(e.start&&(e.start.dateTime||e.start.date||'')).startsWith(ds);}).length;
     scores[ds]={count:cnt,label:d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'})};
   }
   return scores;
@@ -470,7 +528,6 @@ function renderScores(scores){
   }).join('');
 }
 
-// Vue semaine
 function renderWeekGrid(){
   var grid=document.getElementById('weekGrid');
   var today=new Date();
@@ -506,8 +563,7 @@ function showWeekDay(dateISO,idx){
       html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'
         +'<div style="width:7px;height:7px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
         +'<div style="flex:1;font-size:13px">'+it.titre.replace(/\[.*?\]\s*/g,'')+'</div>'
-        +(it.heure?'<div style="font-size:11px;color:#B5CAC1">'+it.heure+'</div>':'')
-        +'</div>';
+        +(it.heure?'<div style="font-size:11px;color:#B5CAC1">'+it.heure+'</div>':'')+'</div>';
     });
   }
   detail.innerHTML=html;detail.classList.add('visible');
@@ -516,30 +572,26 @@ function showWeekDay(dateISO,idx){
   if(days[idx])days[idx].classList.add('selected');
 }
 
-// Dashboard
 function loadDashboard(){
-  if(!gToken)return;
+  if(!msToken)return;
   var dash=document.getElementById('dashboard');
   dash.innerHTML='<div class="empty">Chargement...</div>';
   var n=new Date();
   var in7=new Date(n.getTime()+7*24*3600*1000);
-  fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin='+n.toISOString()+'&timeMax='+in7.toISOString()+'&orderBy=startTime&singleEvents=true&maxResults=50',
-    {headers:{'Authorization':'Bearer '+gToken}})
-  .then(function(r){return r.json();})
+  graphGet('https://graph.microsoft.com/v1.0/me/calendarView?startDateTime='+n.toISOString()+'&endDateTime='+in7.toISOString()+'&$top=50&$select=subject,start,end,seriesMasterId')
   .then(function(calD){
-    var events=(calD.items||[]).filter(function(e){return!e.recurringEventId;});
+    var events=(calD.value||[]).filter(function(e){return!e.seriesMasterId;});
     renderScores(computeScores(events));
-    return getListId().then(function(listId){
-      return fetch('https://tasks.googleapis.com/tasks/v1/lists/'+listId+'/tasks?showCompleted=false&maxResults=30',
-        {headers:{'Authorization':'Bearer '+gToken}})
-      .then(function(r){return r.json();})
+    return getTodoListId().then(function(listId){
+      return graphGet('https://graph.microsoft.com/v1.0/me/todo/lists/'+listId+'/tasks?$filter=status ne \'completed\'&$top=30')
       .then(function(tD){
         allDashItems=events.map(function(e){
-          return{id:e.id,titre:e.summary||'Sans titre',type:'event',
-            date:e.start.dateTime||e.start.date,
+          var dt=e.start.dateTime||e.start.date;
+          return{id:e.id,titre:e.subject||'Sans titre',type:'event',date:dt,
             heure:e.start.dateTime?new Date(e.start.dateTime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'',cat:''};
-        }).concat((tD.items||[]).map(function(t){
-          return{id:t.id,titre:t.title||'Sans titre',type:'task',date:t.due?t.due.split('T')[0]:'',heure:'',cat:''};
+        }).concat((tD.value||[]).map(function(t){
+          return{id:t.id,titre:t.title||'Sans titre',type:'task',
+            date:t.dueDateTime?t.dueDateTime.dateTime.split('T')[0]:'',heure:'',cat:''};
         }));
         if(!allDashItems.length){dash.innerHTML='<div class="empty">Aucun élément 🎉</div>';renderWeekGrid();return;}
         return fetch('https://api.groq.com/openai/v1/chat/completions',{
@@ -591,7 +643,7 @@ function renderDashboard(){
 
 // Brief vocal
 function playBrief(){
-  if(!gToken){showToast('⚠️ Connecte Google');return;}
+  if(!msToken){showToast('⚠️ Connecte Microsoft');return;}
   if(!allDashItems.length){showToast('⚠️ Charge le dashboard');return;}
   var days=parseInt(document.getElementById('briefDays').value);
   window.speechSynthesis.cancel();
@@ -611,7 +663,7 @@ function playBrief(){
   }).join(', ');
   var prompt='Tu es une assistante personnelle directe et efficace.\n'
     +'Brief ULTRA court de '+days+' jours. RÈGLES :\n'
-    +'- Commence par 2-3 mots sur la charge (ex: Semaine tranquille. / Programme chargé. / Journée intense.)\n'
+    +'- Commence par 2-3 mots sur la charge\n'
     +'- Une phrase max par item, direct et concret\n'
     +'- Zéro bonjour, zéro conseil, zéro introduction\n'
     +'- Ton professionnel et bienveillant\n'
@@ -631,12 +683,58 @@ function speak(txt){
   if(!window.speechSynthesis)return;
   window.speechSynthesis.cancel();
   var spk=new SpeechSynthesisUtterance(txt);
-  spk.lang='fr-FR';
-  spk.rate=1.0;
-  spk.pitch=1.0;
-  spk.volume=1;
+  spk.lang='fr-FR';spk.rate=1.0;spk.pitch=1.0;spk.volume=1;
   window.speechSynthesis.speak(spk);
 }
+
+// Mémoire
+function saveMemory(){
+  localStorage.setItem('user_profile',JSON.stringify(memory.profile));
+  localStorage.setItem('task_history',JSON.stringify(memory.history.slice(-50)));
+  localStorage.setItem('patterns',JSON.stringify(memory.patterns));
+}
+
+function addToHistory(taches){
+  var today=new Date().toISOString().split('T')[0];
+  taches.forEach(function(t){
+    memory.history.push({date:today,titre:t.titre,categorie:t.categorie,heure:t.heure});
+    if(t.heure){var key='jour_'+new Date().getDay()+'_'+t.categorie;memory.patterns[key]=(memory.patterns[key]||0)+1;}
+  });
+  saveMemory();
+}
+
+function buildContext(){
+  var ctx='';
+  if(memory.profile.nom||memory.profile.projets){
+    ctx='CONTEXTE UTILISATEUR:\n';
+    if(memory.profile.nom)ctx+='Nom: '+memory.profile.nom+'\n';
+    if(memory.profile.poste)ctx+='Poste: '+memory.profile.poste+'\n';
+    if(memory.profile.projets)ctx+='Projets en cours: '+memory.profile.projets+'\n';
+    if(memory.profile.horaires)ctx+='Horaires: '+memory.profile.horaires+'\n';
+    if(memory.history.length)ctx+='Tâches récentes: '+memory.history.slice(-8).map(function(h){return'"'+h.titre+'"('+h.date+')';}).join(', ')+'\n';
+  }
+  return ctx;
+}
+
+function saveProfile(){
+  memory.profile={nom:document.getElementById('pNom').value.trim(),poste:document.getElementById('pPoste').value.trim(),projets:document.getElementById('pProjets').value.trim(),horaires:document.getElementById('pHoraires').value.trim()};
+  saveMemory();showToast('✅ Profil sauvegardé !');
+}
+
+function renderProfile(){
+  document.getElementById('pNom').value=memory.profile.nom||'';
+  document.getElementById('pPoste').value=memory.profile.poste||'';
+  document.getElementById('pProjets').value=memory.profile.projets||'';
+  document.getElementById('pHoraires').value=memory.profile.horaires||'';
+  var hist=document.getElementById('historyList');
+  if(!memory.history.length){hist.innerHTML='<div class="empty">Aucun historique</div>';return;}
+  hist.innerHTML=memory.history.slice(-15).reverse().map(function(h){
+    return'<div class="card"><div class="card-title">'+h.titre+'</div>'
+      +'<div class="card-meta"><span class="badge b-'+(h.categorie||'travail')+'">'+(h.categorie||'travail')+'</span> · '+h.date+'</div></div>';
+  }).join('');
+}
+
+function clearHistory(){memory.history=[];memory.patterns={};saveMemory();renderProfile();showToast('✅ Effacé');}
 
 // Micro
 var recognition=null,isRecording=false;
@@ -732,12 +830,12 @@ function analyzeWithGroq(transcript){
           +'<div class="check" onclick="this.classList.toggle(\'done\');this.textContent=this.classList.contains(\'done\')?\'✓\':\'\'"></div></div>';
         todayList.appendChild(card);
       });
-      if(gToken){
+      if(msToken){
         parsed.taches.forEach(function(tache){
           createCalendarEvent(tache.titre,tache.date||todayISO,tache.heure,tache.categorie||'travail');
-          createGoogleTask(tache.titre,tache.date||todayISO,tache.categorie||'travail');
+          createTodoTask(tache.titre,tache.date||todayISO,tache.categorie||'travail');
         });
-        showToast('✅ Sync Google !');
+        showToast('✅ Sync Outlook & To Do !');
       }
     }
     speak(parsed.reponse);
