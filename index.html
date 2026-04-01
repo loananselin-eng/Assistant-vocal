@@ -675,7 +675,14 @@ function playBrief(){
     body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.7,max_tokens:400})
   })
   .then(function(r){return r.json();})
-  .then(function(d){speak(d.choices[0].message.content);})
+  .then(function(d){
+    if(!d||!d.choices||!d.choices[0]){
+      showToast('❌ Réponse Groq invalide');
+      console.log('Groq response:',JSON.stringify(d));
+      return;
+    }
+    speak(d.choices[0].message.content);
+  })
   .catch(function(e){showToast('❌ '+e.message);});
 }
 
