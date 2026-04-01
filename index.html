@@ -691,7 +691,17 @@ function speak(txt){
   window.speechSynthesis.cancel();
   var spk=new SpeechSynthesisUtterance(txt);
   spk.lang='fr-FR';spk.rate=1.0;spk.pitch=1.0;spk.volume=1;
-  window.speechSynthesis.speak(spk);
+  var trySpeak=function(){
+    var voices=window.speechSynthesis.getVoices();
+    var voice=voices.find(function(v){return v.name==='Aurélie';})
+      ||voices.find(function(v){return /aurélie|aurelie/i.test(v.name);})
+      ||voices.find(function(v){return v.lang==='fr-FR'&&/female|femme/i.test(v.name);})
+      ||voices.find(function(v){return v.lang==='fr-FR';});
+    if(voice)spk.voice=voice;
+    window.speechSynthesis.speak(spk);
+  };
+  if(window.speechSynthesis.getVoices().length){trySpeak();}
+  else{window.speechSynthesis.onvoiceschanged=function(){trySpeak();window.speechSynthesis.onvoiceschanged=null;};}
 }
 
 // Mémoire
